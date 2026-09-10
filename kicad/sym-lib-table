@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "scamp_act")(type "KiCad")(uri "${KIPRJMOD}/scamp_act.kicad_sym")(options "")(descr "ACT-family logic ICs used in scamp++"))
+)

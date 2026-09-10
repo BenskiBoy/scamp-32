@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "Graphics") (type "KiCad") (uri "/home/benth/programming/scamp-plus/kicad/logo") (options "") (descr ""))
+)

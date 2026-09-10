@@ -1,0 +1,5 @@
+{
+    "add x, (i8h)": {"opcode": 0, "cycles": 8},
+    "out i8l, x": {"opcode": 1, "cycles": 8},
+    "ld x, i8l": {"opcode": 2, "cycles": 8}
+}
