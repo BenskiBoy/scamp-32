@@ -17,6 +17,8 @@ class AsmError(Exception):
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+REGISTER_STRIDE = 4  # bytes per pseudo-register (they're 32-bit wide)
+
 HELP_TEXT = """This is the SCAMP assembler.
 
 Usage: asm [-v] < source.s > binary.hex
@@ -59,14 +61,23 @@ class Assembler:
         self.code = []
         self.lineno = 0
 
-        self.addmacro("sp", "(0xffff)")
+        self.addmacro("sp", "(0xfffffffc)")  # r63
 
-        # add macros for ".def r0 (0xff00)" for 0..255
+        # add macros for ".def r0 (0xffffff00)" for 0..63: 64 pseudo-registers,
+        # each 32 bits wide, live at the top of the i8h range, 4 bytes apart
+        # (REGISTER_STRIDE) -- 64*4 = 256 bytes, exactly filling 0xffffff00 ..
+        # 0xffffffff. The crossbar reconstructs the full 32-bit value from the
+        # low byte by setting the other 24 bits high, so a register access
+        # still fits in a single instruction word.
         # TODO: maybe add a flag to turn off the the default macros?
-        for i in range(256):
+        for i in range(64):
             self.macro[f"r{i}"] = True
         self.macros.append(
-            lambda s: re.sub(r"\br(\d+)\b", lambda m: "(0xff%02x)" % int(m.group(1)), s)
+            lambda s: re.sub(
+                r"\br(\d+)\b",
+                lambda m: "(0xffffff%02x)" % (int(m.group(1)) * REGISTER_STRIDE),
+                s,
+            )
         )
 
     def die(self, msg):
@@ -84,6 +95,24 @@ class Assembler:
         self.code.append(word)
         if not str(word).startswith("__asm"):
             self.pc += 1
+
+    # emit a value as `nbytes` contiguous bytes, least-significant first --
+    # matching the hardware's little-endian multi-byte reads (the byte at
+    # the lower address is the low byte). The fetch model reads bytes back-
+    # to-back with no padding, so every multi-byte value (an i16/i32
+    # argument, or a `.word`) is just a sequence of individual byte
+    # emissions, never a padded/merged word. `value` may be a label name
+    # (str), resolved later in write_output().
+    def emit_multibyte(self, value, nbytes):
+        if isinstance(value, str):
+            for i in range(nbytes):
+                shift = i * 8
+                self.emit(("__label_byte", value, shift))
+        else:
+            value &= (1 << (nbytes * 8)) - 1
+            for i in range(nbytes):
+                shift = i * 8
+                self.emit((value >> shift) & 0xFF)
 
     # examples:
     # x => die
@@ -116,8 +145,15 @@ class Assembler:
     # examples:
     # x => x
     # (x) => \(x\)
-    # (65535)++ => \((i8h|i16)\)\+\+
-    # 605 => i16
+    # (65535)++ => \((i8h|i16l|i32)\)\+\+
+    # 605 => (i16l|i32|605)
+    #
+    # the 32-bit bus's crossbar can put 8, 16, or 32 bits of a value onto
+    # the bus, setting the remaining high bits either all-0 ("l") or all-1
+    # ("h"); i32 always fits (it's the full bus width, so there's no l/h
+    # distinction). A value can match several of these at once (e.g. 5 fits
+    # in i8l, i16l, and i32) -- the fastest matching instruction wins, see
+    # mkparser()/the cycle-count sort below.
     def arg2pattern(self, arg):
         # escape \, (, ), +
         arg = re.sub(r"([\\()+])", r"\\\1", arg)
@@ -128,11 +164,20 @@ class Assembler:
                 return v
             if re.match(r"^\d+$", v):
                 n = int(v)
-                if 0xFF00 <= n <= 0xFFFF:
-                    return f"(i8h|i16|{v})"
-                if 0x0000 <= n <= 0x00FF:
-                    return f"(i8l|i16|{v})"
-            return f"(i16|{v})"
+                types = []
+                if 0x00000000 <= n <= 0x000000FF:
+                    types.append("i8l")
+                if 0xFFFFFF00 <= n <= 0xFFFFFFFF:
+                    types.append("i8h")
+                if 0x00000000 <= n <= 0x0000FFFF:
+                    types.append("i16l")
+                if 0xFFFF0000 <= n <= 0xFFFFFFFF:
+                    types.append("i16h")
+                types.append("i32")
+                return f"({'|'.join(types)}|{v})"
+            # not a plain number (e.g. a label reference): could be stored
+            # as a zero-extended 16-bit address, or as a full 32-bit word
+            return f"(i16l|i32|{v})"
 
         arg = re.sub(r"\b([a-z_0-9]+)\b", subst, arg, flags=re.IGNORECASE)
         return arg
@@ -160,6 +205,24 @@ class Assembler:
     def params(self, op, n, args):
         if len(args) != n:
             self.die(f"{op}: expected {n} arguments, found {len(args)}")
+
+    # how many extra bytes (beyond the opcode byte itself) an instruction's
+    # encoding needs: i8l/i8h take one following byte, i16l/i16h take two,
+    # i32 takes four
+    def operand_bytes(self, instr_key):
+        instr_parts = instr_key.split(" ", 1)
+        params_str = instr_parts[1] if len(instr_parts) > 1 else ""
+        params = re.split(r"\s*,\s*", params_str) if params_str else []
+
+        n = 0
+        for p in params:
+            if re.search(r"i8", p):
+                n += 1
+            elif re.search(r"i32", p):
+                n += 4
+            elif re.search(r"i16", p):
+                n += 2
+        return n
 
     def process_line(self, line):
         orig_line = line
@@ -221,18 +284,18 @@ class Assembler:
                 if at < self.pc:
                     self.die(f".at {at} but we're already at {self.pc}")
                 for _ in range(self.pc + 1, at + 1):
-                    self.emit(0x0000)
+                    self.emit(0)
             self.pc = at
         elif op in (".g", ".gap"):
             self.params(op, 1, args)
             for _ in range(self.numarg(args[0])):
-                self.emit(0x0000)
+                self.emit(0)
         elif op in (".w", ".word"):
             self.params(op, 1, args)
             if re.match(r"^[a-z_][a-z_0-9]*$", args[0], re.IGNORECASE):
-                self.emit(args[0])
+                self.emit_multibyte(args[0], 2)
             else:
-                self.emit(self.numarg(args[0]))
+                self.emit_multibyte(self.numarg(args[0]), 2)
         elif op == ".str":
             s = line
             # note: `.str` is used unescaped here too, same as `.d`/`.def` above
@@ -260,36 +323,47 @@ class Assembler:
             if not match:
                 self.die(f"unrecognised operation: {line}")
 
-            # sort the matches by cycle count, so we choose the fastest match;
-            # we can get multiple matches in cases like "ld r0, r1" where
-            # both "ld (i16), (i8h)" and "ld (i8h), (i16)" match
-            # (we sort twice so that the ordering is always the same)
+            # sort the matches by cycle count, then by how many extra
+            # operand words they need, so we choose the fastest/smallest
+            # match; we can get multiple matches in cases like "ld r0, r1"
+            # where both "ld (i16h), (i8h)" and "ld (i8h), (i16h)" match,
+            # or "ld x, r0" where both "ld x, (i8h)" and "ld x, (i16h)"
+            # match (r0 fits in either) -- the latter needing an extra word
+            # (we sort three times so that the ordering is always the same)
             match = sorted(match)
+            match = sorted(match, key=self.operand_bytes)
             match = sorted(match, key=lambda m: self.instructions[m]["cycles"])
 
-            # generate code:
-            #  - upper 8 bits of instruction come from opcode
-            #  - lower 8 bits of instruction are i8l/i8h, if any,
-            #    otherwise ignored (so 0)
-            #  - the i16 argument comes next, if any
-            #  - if we don't yet know the address for a label, just
-            #    store the text and it'll get filled in later
-            opcode = self.instructions[match[0]]["opcode"] << 8
-            operands = []
-
+            # generate code: the opcode is always exactly one byte, and any
+            # argument's bytes follow immediately with no padding, since the
+            # fetch only ever consumes the opcode byte itself -- any further
+            # bytes are read by the instruction's own explicit microcode:
+            #  - i8l/i8h take one following byte
+            #  - i16l/i16h take two following bytes, low byte first
+            #  - i32 takes four following bytes, low byte first
+            #  - if we don't yet know the address for a label, defer it:
+            #    emit_multibyte() stores markers that write_output() fills
+            #    in once every label's address is known
             instr_parts = match[0].split(" ", 1)
             params_str = instr_parts[1] if len(instr_parts) > 1 else ""
             params = re.split(r"\s*,\s*", params_str) if params_str else []
 
+            self.emit(self.instructions[match[0]]["opcode"] & 0xFF)
+
             for i in range(len(argpattern)):
                 if re.search(r"i8", params[i]):
-                    opcode |= self.arg2num(args[i]) & 0xFF
+                    self.emit(self.arg2num(args[i]) & 0xFF)
+                elif re.search(r"i32", params[i]):
+                    self.emit_multibyte(self.arg2num(args[i]), 4)
                 elif re.search(r"i16", params[i]):
-                    operands.append(self.arg2num(args[i]))
+                    self.emit_multibyte(self.arg2num(args[i]), 2)
 
-            self.emit(opcode)
-            for o in operands:
-                self.emit(o)
+            # some instructions (e.g. "xor x, y") need a fixed pseudo-register
+            # operand that the programmer never writes -- ucode.s marks these
+            # with "# implicit: rN" and mk-instructions-json.py records it
+            implicit_reg = self.instructions[match[0]].get("implicit_reg")
+            if implicit_reg is not None:
+                self.emit((implicit_reg * REGISTER_STRIDE) & 0xFF)
 
         self.emit(f"__asm_annotation {orig_line}")
 
@@ -317,18 +391,20 @@ class Assembler:
                         chars_on_line = 0
                     continue
 
-            if not re.match(r"^-?\d+$", str(c)):
-                if c not in self.label:
-                    raise AsmError(f"error: label {c} not found")
-                c = self.label[c]
+            if isinstance(c, tuple):
+                # a byte of a label's address, unresolved until now
+                _, label_name, shift = c
+                if label_name not in self.label:
+                    raise AsmError(f"error: label {label_name} not found")
+                c = (self.label[label_name] >> shift) & 0xFF
 
             c = int(c)
             if c < 0:
-                c += 65536
-            if c < 0 or c > 0xFFFF:
+                c += 256
+            if c < 0 or c > 0xFF:
                 raise AsmError(f"error: {c} out of range")
-            fh.write("%04x%s" % (c, " " if verbose else "\n"))
-            chars_on_line += 5
+            fh.write("%02x%s" % (c, " " if verbose else "\n"))
+            chars_on_line += 3
 
 
 def build_parser():

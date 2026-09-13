@@ -153,6 +153,15 @@ def die(lineno, msg):
     raise AsmError(f"line {lineno}: {msg}")
 
 
+def normalize_line(line):
+    line = line.rstrip("\n")
+    line = re.sub(r"#.*", "", line)  # strip comments
+    line = re.sub(r"^\s+", "", line)  # strip leading spaces
+    line = re.sub(r"\s$", "", line)  # strip trailing spaces
+    line = re.sub(r"\s+", " ", line, count=1)  # collapse spaces
+    return line
+
+
 def encode(uinstr, mnemonic, lineno):
     bits = uinstr.split(" ")
 
@@ -258,11 +267,7 @@ def main():
     for line in fileinput.input():
         lineno = fileinput.lineno()
 
-        line = line.rstrip("\n")
-        line = re.sub(r"#.*", "", line)  # strip comments
-        line = re.sub(r"^\s+", "", line)  # strip leading spaces
-        line = re.sub(r"\s$", "", line)  # strip trailing spaces
-        line = re.sub(r"\s+", " ", line, count=1)  # collapse spaces
+        line = normalize_line(line)
 
         if line == "":
             continue

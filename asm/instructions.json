@@ -1,5 +1,51 @@
 {
-    "add x, (i8h)": {"opcode": 0, "cycles": 8},
-    "out i8l, x": {"opcode": 1, "cycles": 8},
-    "ld x, i8l": {"opcode": 2, "cycles": 8}
+    "add x, (i8h)": {
+        "cycles": 8,
+        "opcode": 0
+    },
+    "add x, i8l": {
+        "cycles": 8,
+        "opcode": 3
+    },
+    "and x, i8l": {
+        "cycles": 8,
+        "opcode": 8
+    },
+    "dec x": {
+        "cycles": 8,
+        "opcode": 6
+    },
+    "inc x": {
+        "cycles": 8,
+        "opcode": 5
+    },
+    "ld x, i8l": {
+        "cycles": 8,
+        "opcode": 2
+    },
+    "ld y, i16l": {
+        "cycles": 8,
+        "opcode": 11
+    },
+    "or x, i8l": {
+        "cycles": 8,
+        "opcode": 9
+    },
+    "out i8l, x": {
+        "cycles": 8,
+        "opcode": 1
+    },
+    "shl x": {
+        "cycles": 8,
+        "opcode": 7
+    },
+    "sub x, i8l": {
+        "cycles": 8,
+        "opcode": 4
+    },
+    "xor x, y": {
+        "cycles": 8,
+        "implicit_reg": 62,
+        "opcode": 10
+    }
 }
