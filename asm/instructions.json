@@ -15,6 +15,10 @@
         "cycles": 8,
         "opcode": 7
     },
+    "inc (i8h)": {
+        "cycles": 8,
+        "opcode": 17
+    },
     "inc x": {
         "cycles": 8,
         "opcode": 6
@@ -22,6 +26,14 @@
     "jmp i32": {
         "cycles": 8,
         "opcode": 15
+    },
+    "jnz i32": {
+        "cycles": 8,
+        "opcode": 18
+    },
+    "ld (i8h), i32": {
+        "cycles": 8,
+        "opcode": 16
     },
     "ld sp, i32": {
         "cycles": 8,
@@ -38,6 +50,14 @@
     "or x, i8l": {
         "cycles": 8,
         "opcode": 10
+    },
+    "out i32, (i8h)": {
+        "byte_order": [
+            1,
+            0
+        ],
+        "cycles": 8,
+        "opcode": 19
     },
     "out i8l, x": {
         "cycles": 8,

@@ -76,3 +76,29 @@ pop x: # Pre-increment <tt>sp</tt>. Load <tt>x</tt> from the value in <tt>(sp)</
 jmp i32: # Jump to <tt>i32</tt>.
     PO AI
     MO32 JMP
+
+ld (i8h), i32: # Load <tt>i32</tt> into <tt>r</tt>.
+    PO AI
+    MO8H AI P+1
+    MO32 XI P+4
+    YO AI
+    MI32 XO
+
+inc (i8h): # Increment <tt>r</tt>.
+    PO AI
+    MO8H YI P+1
+    YO AI
+    MO32 YI
+    MI32 Y+1
+
+jnz i32: # Jump to <tt>i32</tt> if <tt>Z</tt> is not set.
+    PO AI
+    MO32 JNZ P+4
+
+out i32, (i8h): # Output <tt>r</tt> to address <tt>i32</tt>.
+    # byte-order: 1,0
+    PO AI
+    MO8H AI P+1
+    MO32 YI P+4
+    YO AI
+    DI YO

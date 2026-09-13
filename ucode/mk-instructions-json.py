@@ -25,6 +25,14 @@ from uasm import INSTR_RE, MAX_OPCODE, T_STATES, AsmError, normalize_line  # noq
 # scratch register, but shouldn't require the caller to name one.
 IMPLICIT_RE = re.compile(r"#\s*implicit:\s*r(\d+)\b", re.IGNORECASE)
 
+# "# byte-order: 1,0" on a line inside an instruction's block overrides the
+# order operand bytes are emitted in, independent of the order the caller
+# types them (and the signature's own param order, used for matching). E.g.
+# "out i32, (i8h)" keeps its natural "value, address" typing order, but the
+# microcode wants the address (index 1) fetched before the value (index 0)
+# to avoid clobbering AI -- "# byte-order: 1,0" emits param 1's bytes first.
+BYTE_ORDER_RE = re.compile(r"#\s*byte-order:\s*([\d,\s]+)", re.IGNORECASE)
+
 
 def extract_instructions(path):
     instructions = {}
@@ -36,6 +44,12 @@ def extract_instructions(path):
             m_implicit = IMPLICIT_RE.search(raw_line)
             if m_implicit and current_mnemonic is not None:
                 instructions[current_mnemonic]["implicit_reg"] = int(m_implicit.group(1))
+
+            m_byte_order = BYTE_ORDER_RE.search(raw_line)
+            if m_byte_order and current_mnemonic is not None:
+                instructions[current_mnemonic]["byte_order"] = [
+                    int(n) for n in m_byte_order.group(1).split(",") if n.strip() != ""
+                ]
 
             line = normalize_line(raw_line)
             if line == "":

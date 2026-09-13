@@ -369,7 +369,14 @@ class Assembler:
             # scale_for_sp()
             sp_scaled = "sp" in params
 
-            for i in range(len(argpattern)):
+            # ucode.s can override the order operand bytes are emitted in
+            # (independent of the order the caller types them) with
+            # "# byte-order: 1,0" -- see mk-instructions-json.py
+            byte_order = self.instructions[match[0]].get(
+                "byte_order", list(range(len(argpattern)))
+            )
+
+            for i in byte_order:
                 if re.search(r"i8", params[i]):
                     val = self.arg2num(args[i])
                     if sp_scaled:
