@@ -3,6 +3,10 @@ add x, (i8h): # Add <tt>r</tt> to <tt>x</tt>.
     MO32 YI
     XI X+Y
 
+ld sp, i32: # Load <tt>i32</tt> into <tt>sp</tt>.
+    PO AI
+    MO32 SI P+4
+
 out i8l, x: # Output <tt>x</tt> to address <tt>i8l</tt>.
     MO8L AI 
     XO DI 
@@ -55,3 +59,20 @@ xor x, y: # XOR <tt>y</tt> with <tt>x</tt>.
 ld y, i16l: # Load <tt>i16</tt> into <tt>y</tt>.
     PO AI
     MO16L YI P+2
+
+push i8l: # Store <tt>i8l</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt>.
+    PO AI
+    MO8L YI P+1
+    SO AI
+    MI8 YO 
+    SP-4
+    
+
+pop x: # Pre-increment <tt>sp</tt>. Load <tt>x</tt> from the value in <tt>(sp)</tt>.
+    SP+4 
+    SO AI
+    MO32 XI
+
+jmp i32: # Jump to <tt>i32</tt>.
+    PO AI
+    MO32 JMP

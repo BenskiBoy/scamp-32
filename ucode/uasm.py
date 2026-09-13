@@ -10,8 +10,8 @@ MAX_OPCODE = 255
 T_STATES = 8
 
 IS_ALU = {"EX", "NX", "EY", "NY", "F", "NO"}
-IS_BUSOUT = {"PO", "MO8L", "MO8H", "MO16L", "MO16H", "MO32", "DO", "IVO"}
-IS_BUSIN = {"AI", "MI8", "MI16", "MI32", "II", "XI", "YI", "DI", "IVI"}
+IS_BUSOUT = {"PO", "MO8L", "MO8H", "MO16L", "MO16H", "MO32", "DO", "IVO", "SO"}
+IS_BUSIN = {"AI", "MI8", "MI16", "MI32", "II", "XI", "YI", "DI", "IVI", "SI"}
 IS_JMP = {"JC", "JZ", "JNZ", "JGT", "JLT", "JMP"}
 
 UCODE = {
@@ -21,6 +21,7 @@ UCODE = {
     "XI": 0x0004,
     "YI": 0x0005,
     "IVI": 0x0006,
+    "SI": 0x0007,
     # --------------
     "EO": 0x8000,
     "JZ": 0x0800,
@@ -40,7 +41,6 @@ UCODE = {
     "MO16L": 0x0020,
     "MO16H": 0x0028,
     "MO32": 0x0030,
-    "IVO": 0x0038,
     # --------------
     "P+1": 0x1000,
     "P+2": 0x2000,
@@ -49,8 +49,13 @@ UCODE = {
     "MI8": 0x5000,
     "MI16": 0x6000,
     "MI32": 0x7000,
-    "IEN": 0x0047,
-    "IDS": 0x0087,
+    # --------------
+    "SO": 0x0038,
+    "IEN": 0x0078,
+    "IDS": 0x00B8,
+    "SP+4": 0x00F8,
+    "SP-4": 0x0138,
+    "IVO": 0x0178,
     # "EO": 0x8000,
     # "EX": 0x4000,
     # "NX": 0x2000,
@@ -142,6 +147,13 @@ ALU = {
     "~(Y&X)": "EX EY NO",
 }
 
+# JNZ/JMP are shorthand for combinations of the real JZ/JGT/JLT bits (not
+# real ucode bits themselves), expanded the same way ALU shorthand is
+JMP_SUGAR = {
+    "JNZ": "JLT JGT",
+    "JMP": "JZ JLT JGT",
+}
+
 INSTR_RE = re.compile(r"^([a-z_0-9, ()+-]+): ?([0-9a-f]*)$", re.IGNORECASE)
 
 
@@ -179,11 +191,17 @@ def encode(uinstr, mnemonic, lineno):
             if ALU[b]:
                 alu_bits.extend(ALU[b].split(" "))
 
-    bits = bits + alu_bits
+    # append bits for JNZ/JMP shorthand
+    jmp_bits = []
+    for b in bits:
+        if b in JMP_SUGAR:
+            jmp_bits.extend(JMP_SUGAR[b].split(" "))
+
+    bits = bits + alu_bits + jmp_bits
 
     num = 0
     for b in bits:
-        if b in ALU:
+        if b in ALU or b in JMP_SUGAR:
             continue  # skip these bits, we already appended them
         if b not in UCODE:
             die(lineno, f"unrecognised ucode: {b}")

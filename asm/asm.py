@@ -61,7 +61,10 @@ class Assembler:
         self.code = []
         self.lineno = 0
 
-        self.addmacro("sp", "(0xfffffffc)")  # r63
+        # note: "sp" is NOT a macro -- it's a dedicated physical register
+        # (SI/SO/SP+4/SP-4 in ucode.s), not a memory-mapped pseudo-register,
+        # so it's matched as a literal token, the same way "x"/"y" are (see
+        # arg2pattern/arg2num/namearg)
 
         # add macros for ".def r0 (0xffffff00)" for 0..63: 64 pseudo-registers,
         # each 32 bits wide, live at the top of the i8h range, 4 bytes apart
@@ -123,7 +126,7 @@ class Assembler:
     # 1((65535)) => 1
     # 1(x) => 1
     def arg2num(self, arg):
-        if re.match(r"^(x|y|pc)$", arg):
+        if re.match(r"^(x|y|sp|pc)$", arg):
             self.die(f"can't convert register to number: {arg}")
 
         m = re.search(r"(\d+)\(x\)", arg)
@@ -160,7 +163,7 @@ class Assembler:
 
         def subst(m):
             v = m.group(1)
-            if re.match(r"^(x|y|pc)$", v):
+            if re.match(r"^(x|y|sp|pc)$", v):
                 return v
             if re.match(r"^\d+$", v):
                 n = int(v)
@@ -185,7 +188,7 @@ class Assembler:
     def namearg(self, arg):
         if not re.match(r"^[a-z_][a-z_0-9]*$", arg, re.IGNORECASE):
             self.die(f"invalid name: {arg}")
-        if re.match(r"^(x|y)$", arg, re.IGNORECASE):
+        if re.match(r"^(x|y|sp)$", arg, re.IGNORECASE):
             self.die(f"'{arg}' is a reserved name")
         return arg
 
@@ -205,6 +208,18 @@ class Assembler:
     def params(self, op, n, args):
         if len(args) != n:
             self.die(f"{op}: expected {n} arguments, found {len(args)}")
+
+    # sp's counter only steps on bits [31:2] (so a single SP+4/SP-4 pulse
+    # moves it by exactly REGISTER_STRIDE), and a value loaded directly into
+    # it lands in those same upper bits -- so it comes out multiplied by
+    # REGISTER_STRIDE. Any instruction naming sp as an operand needs its
+    # numeric argument pre-divided (and checked for divisibility) here.
+    def scale_for_sp(self, val):
+        if isinstance(val, str):
+            self.die(f"can't load a label into sp: {val}")
+        if val % REGISTER_STRIDE != 0:
+            self.die(f"sp value {val} is not a multiple of {REGISTER_STRIDE}")
+        return val // REGISTER_STRIDE
 
     # how many extra bytes (beyond the opcode byte itself) an instruction's
     # encoding needs: i8l/i8h take one following byte, i16l/i16h take two,
@@ -350,13 +365,26 @@ class Assembler:
 
             self.emit(self.instructions[match[0]]["opcode"] & 0xFF)
 
+            # loading sp directly needs the value pre-scaled -- see
+            # scale_for_sp()
+            sp_scaled = "sp" in params
+
             for i in range(len(argpattern)):
                 if re.search(r"i8", params[i]):
-                    self.emit(self.arg2num(args[i]) & 0xFF)
+                    val = self.arg2num(args[i])
+                    if sp_scaled:
+                        val = self.scale_for_sp(val)
+                    self.emit(val & 0xFF)
                 elif re.search(r"i32", params[i]):
-                    self.emit_multibyte(self.arg2num(args[i]), 4)
+                    val = self.arg2num(args[i])
+                    if sp_scaled:
+                        val = self.scale_for_sp(val)
+                    self.emit_multibyte(val, 4)
                 elif re.search(r"i16", params[i]):
-                    self.emit_multibyte(self.arg2num(args[i]), 2)
+                    val = self.arg2num(args[i])
+                    if sp_scaled:
+                        val = self.scale_for_sp(val)
+                    self.emit_multibyte(val, 2)
 
             # some instructions (e.g. "xor x, y") need a fixed pseudo-register
             # operand that the programmer never writes -- ucode.s marks these

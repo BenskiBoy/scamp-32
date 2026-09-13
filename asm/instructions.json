@@ -5,47 +5,63 @@
     },
     "add x, i8l": {
         "cycles": 8,
-        "opcode": 3
+        "opcode": 4
     },
     "and x, i8l": {
         "cycles": 8,
-        "opcode": 8
+        "opcode": 9
     },
     "dec x": {
         "cycles": 8,
-        "opcode": 6
+        "opcode": 7
     },
     "inc x": {
         "cycles": 8,
-        "opcode": 5
+        "opcode": 6
     },
-    "ld x, i8l": {
+    "jmp i32": {
         "cycles": 8,
-        "opcode": 2
+        "opcode": 15
     },
-    "ld y, i16l": {
-        "cycles": 8,
-        "opcode": 11
-    },
-    "or x, i8l": {
-        "cycles": 8,
-        "opcode": 9
-    },
-    "out i8l, x": {
+    "ld sp, i32": {
         "cycles": 8,
         "opcode": 1
     },
+    "ld x, i8l": {
+        "cycles": 8,
+        "opcode": 3
+    },
+    "ld y, i16l": {
+        "cycles": 8,
+        "opcode": 12
+    },
+    "or x, i8l": {
+        "cycles": 8,
+        "opcode": 10
+    },
+    "out i8l, x": {
+        "cycles": 8,
+        "opcode": 2
+    },
+    "pop x": {
+        "cycles": 8,
+        "opcode": 14
+    },
+    "push i8l": {
+        "cycles": 8,
+        "opcode": 13
+    },
     "shl x": {
         "cycles": 8,
-        "opcode": 7
+        "opcode": 8
     },
     "sub x, i8l": {
         "cycles": 8,
-        "opcode": 4
+        "opcode": 5
     },
     "xor x, y": {
         "cycles": 8,
         "implicit_reg": 62,
-        "opcode": 10
+        "opcode": 11
     }
 }

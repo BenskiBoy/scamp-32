@@ -1,3 +1,12 @@
+# 15: conditional jump
+ld r0, 0
+ld x, 15
+L2:
+inc r0
+dec x
+jnz L2
+out 0, r0
+
 # 0
 ld x, 0
 out 0, x
@@ -57,3 +66,18 @@ xor x, y
 out 0, x
 
 
+# 14: unconditional jump
+ld x, 14
+jmp L
+ld x, 42
+L: out 0, x
+
+# 12,13: push 13, push 12, pop, out, pop, out
+ld sp, 2048
+push 13
+push 12
+ld x, 42
+pop x
+out 0, x
+pop x
+out 0, x
