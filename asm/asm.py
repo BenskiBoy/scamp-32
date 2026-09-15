@@ -209,18 +209,6 @@ class Assembler:
         if len(args) != n:
             self.die(f"{op}: expected {n} arguments, found {len(args)}")
 
-    # sp's counter only steps on bits [31:2] (so a single SP+4/SP-4 pulse
-    # moves it by exactly REGISTER_STRIDE), and a value loaded directly into
-    # it lands in those same upper bits -- so it comes out multiplied by
-    # REGISTER_STRIDE. Any instruction naming sp as an operand needs its
-    # numeric argument pre-divided (and checked for divisibility) here.
-    def scale_for_sp(self, val):
-        if isinstance(val, str):
-            self.die(f"can't load a label into sp: {val}")
-        if val % REGISTER_STRIDE != 0:
-            self.die(f"sp value {val} is not a multiple of {REGISTER_STRIDE}")
-        return val // REGISTER_STRIDE
-
     # how many extra bytes (beyond the opcode byte itself) an instruction's
     # encoding needs: i8l/i8h take one following byte, i16l/i16h take two,
     # i32 takes four
@@ -365,10 +353,6 @@ class Assembler:
 
             self.emit(self.instructions[match[0]]["opcode"] & 0xFF)
 
-            # loading sp directly needs the value pre-scaled -- see
-            # scale_for_sp()
-            sp_scaled = "sp" in params
-
             # ucode.s can override the order operand bytes are emitted in
             # (independent of the order the caller types them) with
             # "# byte-order: 1,0" -- see mk-instructions-json.py
@@ -378,20 +362,11 @@ class Assembler:
 
             for i in byte_order:
                 if re.search(r"i8", params[i]):
-                    val = self.arg2num(args[i])
-                    if sp_scaled:
-                        val = self.scale_for_sp(val)
-                    self.emit(val & 0xFF)
+                    self.emit(self.arg2num(args[i]) & 0xFF)
                 elif re.search(r"i32", params[i]):
-                    val = self.arg2num(args[i])
-                    if sp_scaled:
-                        val = self.scale_for_sp(val)
-                    self.emit_multibyte(val, 4)
+                    self.emit_multibyte(self.arg2num(args[i]), 4)
                 elif re.search(r"i16", params[i]):
-                    val = self.arg2num(args[i])
-                    if sp_scaled:
-                        val = self.scale_for_sp(val)
-                    self.emit_multibyte(val, 2)
+                    self.emit_multibyte(self.arg2num(args[i]), 2)
 
             # some instructions (e.g. "xor x, y") need a fixed pseudo-register
             # operand that the programmer never writes -- ucode.s marks these
@@ -399,6 +374,13 @@ class Assembler:
             implicit_reg = self.instructions[match[0]].get("implicit_reg")
             if implicit_reg is not None:
                 self.emit((implicit_reg * REGISTER_STRIDE) & 0xFF)
+
+            # some instructions (e.g. "push8"/"push16"/"push32") embed a
+            # fixed, plain constant the programmer never writes -- ucode.s
+            # marks these with "# implicit-byte: N"
+            implicit_byte = self.instructions[match[0]].get("implicit_byte")
+            if implicit_byte is not None:
+                self.emit(implicit_byte & 0xFF)
 
         self.emit(f"__asm_annotation {orig_line}")
 

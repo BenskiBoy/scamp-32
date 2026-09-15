@@ -1,54 +1,54 @@
 {
     "add x, (i8h)": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 0
     },
     "add x, i8l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 4
     },
     "and x, i8l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 9
     },
     "dec x": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 7
     },
     "inc (i8h)": {
-        "cycles": 8,
-        "opcode": 17
+        "cycles": 16,
+        "opcode": 24
     },
     "inc x": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 6
     },
     "jmp i32": {
-        "cycles": 8,
-        "opcode": 15
+        "cycles": 16,
+        "opcode": 22
     },
     "jnz i32": {
-        "cycles": 8,
-        "opcode": 18
+        "cycles": 16,
+        "opcode": 25
     },
     "ld (i8h), i32": {
-        "cycles": 8,
-        "opcode": 16
+        "cycles": 16,
+        "opcode": 23
     },
     "ld sp, i32": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 1
     },
     "ld x, i8l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 3
     },
     "ld y, i16l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 12
     },
     "or x, i8l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 10
     },
     "out i32, (i8h)": {
@@ -56,31 +56,77 @@
             1,
             0
         ],
-        "cycles": 8,
-        "opcode": 19
+        "cycles": 16,
+        "opcode": 26
     },
     "out i8l, x": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 2
     },
-    "pop x": {
-        "cycles": 8,
+    "pop16 x": {
+        "cycles": 16,
+        "implicit_byte": 2,
+        "opcode": 20
+    },
+    "pop32 x": {
+        "cycles": 16,
+        "implicit_byte": 4,
+        "opcode": 21
+    },
+    "pop8 x": {
+        "cycles": 16,
+        "implicit_byte": 1,
+        "opcode": 19
+    },
+    "push16 i16l": {
+        "cycles": 16,
+        "implicit_byte": 2,
         "opcode": 14
     },
-    "push i8l": {
-        "cycles": 8,
+    "push16 x": {
+        "cycles": 16,
+        "implicit_byte": 2,
+        "opcode": 17
+    },
+    "push32 i32": {
+        "cycles": 16,
+        "implicit_byte": 4,
+        "opcode": 15
+    },
+    "push32 x": {
+        "cycles": 16,
+        "implicit_byte": 4,
+        "opcode": 18
+    },
+    "push8 i8l": {
+        "cycles": 16,
+        "implicit_byte": 1,
         "opcode": 13
     },
+    "push8 x": {
+        "cycles": 16,
+        "implicit_byte": 1,
+        "opcode": 16
+    },
+    "sb (i8h), i8l": {
+        "cycles": 16,
+        "opcode": 28
+    },
     "shl x": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 8
     },
     "sub x, i8l": {
-        "cycles": 8,
+        "cycles": 16,
         "opcode": 5
     },
+    "tbsz (i8h), i32": {
+        "cycles": 16,
+        "implicit_reg": 63,
+        "opcode": 27
+    },
     "xor x, y": {
-        "cycles": 8,
+        "cycles": 16,
         "implicit_reg": 62,
         "opcode": 11
     }

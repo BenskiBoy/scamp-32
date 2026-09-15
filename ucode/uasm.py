@@ -7,10 +7,22 @@ import re
 import sys
 
 MAX_OPCODE = 255
-T_STATES = 8
+T_STATES = 16
 
 IS_ALU = {"EX", "NX", "EY", "NY", "F", "NO"}
-IS_BUSOUT = {"PO", "MO8L", "MO8H", "MO16L", "MO16H", "MO32", "DO", "IVO", "SO"}
+IS_BUSOUT = {
+    "PO",
+    "MO8L",
+    "MO8H",
+    "MO16L",
+    "MO16H",
+    "MO32",
+    "DO",
+    "IVO",
+    "SO",
+    "IOL",
+    "IOH",
+}
 IS_BUSIN = {"AI", "MI8", "MI16", "MI32", "II", "XI", "YI", "DI", "IVI", "SI"}
 IS_JMP = {"JC", "JZ", "JNZ", "JGT", "JLT", "JMP"}
 
@@ -53,9 +65,9 @@ UCODE = {
     "SO": 0x0038,
     "IEN": 0x0078,
     "IDS": 0x00B8,
-    "SP+4": 0x00F8,
-    "SP-4": 0x0138,
     "IVO": 0x0178,
+    "IOH": 0x01B8,
+    "IOL": 0x01F8,
     # "EO": 0x8000,
     # "EX": 0x4000,
     # "NX": 0x2000,
@@ -258,7 +270,7 @@ def emit_ucode(for_mnemonic, ucode, lineno):
     if not (for_mnemonic is not None and for_mnemonic == "irq"):
         ucode = [
             encode("PO AI", for_mnemonic, lineno),
-            encode("MO8L II P+1", for_mnemonic, lineno),
+            encode("MO16L II P+1", for_mnemonic, lineno),
         ] + ucode
 
     # pad the rest of the ucode with "reset t-state" microcode

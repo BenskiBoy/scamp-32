@@ -1,4 +1,25 @@
 
+# 16: shift-right by 8
+ld r0, 0x1000
+ld r62, 0
+tbsz r0, 0x8000
+sb r62, 0x80
+tbsz r0, 0x4000
+sb r62, 0x40
+tbsz r0, 0x2000
+sb r62, 0x20
+tbsz r0, 0x1000
+sb r62, 0x10
+tbsz r0, 0x0800
+sb r62, 0x08
+tbsz r0, 0x0400
+sb r62, 0x04
+tbsz r0, 0x0200
+sb r62, 0x02
+tbsz r0, 0x0100
+sb r62, 0x01
+# if we're lucky, r62 now has 0x1000 >> 8
+out 0, r62
 
 # 0
 ld x, 0
@@ -59,15 +80,14 @@ xor x, y
 out 0, x
 
 
-
 # 12,13: push 13, push 12, pop, out, pop, out
 ld sp, 2048
-push 13
-push 12
+push8 12
+push8 13
 ld x, 42
-pop x
+pop8 x
 out 0, x
-pop x
+pop8 x
 out 0, x
 
 # 14: unconditional jump

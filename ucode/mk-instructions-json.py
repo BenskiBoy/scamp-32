@@ -33,6 +33,13 @@ IMPLICIT_RE = re.compile(r"#\s*implicit:\s*r(\d+)\b", re.IGNORECASE)
 # to avoid clobbering AI -- "# byte-order: 1,0" emits param 1's bytes first.
 BYTE_ORDER_RE = re.compile(r"#\s*byte-order:\s*([\d,\s]+)", re.IGNORECASE)
 
+# "# implicit-byte: N" on a line inside an instruction's block means the
+# assembler should silently append a fixed, plain byte value N (0-255),
+# without the programmer writing it -- e.g. push8/push16/push32 each embed
+# their own width (1/2/4) so the microcode can fetch it via IOL and compute
+# the sp adjustment with a single "Y-X" instead of chaining Y-1/Y+1.
+IMPLICIT_BYTE_RE = re.compile(r"#\s*implicit-byte:\s*(\d+)\b", re.IGNORECASE)
+
 
 def extract_instructions(path):
     instructions = {}
@@ -50,6 +57,10 @@ def extract_instructions(path):
                 instructions[current_mnemonic]["byte_order"] = [
                     int(n) for n in m_byte_order.group(1).split(",") if n.strip() != ""
                 ]
+
+            m_implicit_byte = IMPLICIT_BYTE_RE.search(raw_line)
+            if m_implicit_byte and current_mnemonic is not None:
+                instructions[current_mnemonic]["implicit_byte"] = int(m_implicit_byte.group(1))
 
             line = normalize_line(raw_line)
             if line == "":
