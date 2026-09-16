@@ -299,6 +299,9 @@ class Assembler:
                 self.emit_multibyte(args[0], 2)
             else:
                 self.emit_multibyte(self.numarg(args[0]), 2)
+        elif op in (".b", ".byte"):
+            self.params(op, 1, args)
+            self.emit(self.numarg(args[0]) & 0xFF)
         elif op == ".str":
             s = line
             # note: `.str` is used unescaped here too, same as `.d`/`.def` above

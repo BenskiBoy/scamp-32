@@ -1,25 +1,30 @@
+# 19: summing numbers in a list, using auto-increment
+.def ptr r12
+ld ptr, list19
+ld x, 0
+ld r0, 10
+L3:
+    ld y, x
+    ld x, (ptr++), 1
+    add x, y
+    out 1, x
+    dec r0
+    jnz L3
+out 1, x
+jmp after19
+list19:
+.byte 1
+.byte 2
+.byte 5
+.byte 0
+.byte 0
+.byte 3
+.byte 3
+.byte 4
+.byte 0
+.byte 1
+after19:
 
-# 16: shift-right by 8
-ld r0, 0x1000
-ld r62, 0
-tbsz r0, 0x8000
-sb r62, 0x80
-tbsz r0, 0x4000
-sb r62, 0x40
-tbsz r0, 0x2000
-sb r62, 0x20
-tbsz r0, 0x1000
-sb r62, 0x10
-tbsz r0, 0x0800
-sb r62, 0x08
-tbsz r0, 0x0400
-sb r62, 0x04
-tbsz r0, 0x0200
-sb r62, 0x02
-tbsz r0, 0x0100
-sb r62, 0x01
-# if we're lucky, r62 now has 0x1000 >> 8
-out 0, r62
 
 # 0
 ld x, 0
@@ -103,4 +108,42 @@ L2:
 inc r0
 dec x
 jnz L2
+out 0, r0
+
+# 16: shift-right by 8
+ld r0, 0x1000
+ld r62, 0
+tbsz r0, 0x8000
+sb r62, 0x80
+tbsz r0, 0x4000
+sb r62, 0x40
+tbsz r0, 0x2000
+sb r62, 0x20
+tbsz r0, 0x1000
+sb r62, 0x10
+tbsz r0, 0x0800
+sb r62, 0x08
+tbsz r0, 0x0400
+sb r62, 0x04
+tbsz r0, 0x0200
+sb r62, 0x02
+tbsz r0, 0x0100
+sb r62, 0x01
+# if we're lucky, r62 now has 0x1000 >> 8
+out 0, r62
+
+# 17: xor x, y
+# 17 = 0x0011 = 0b0000000000010001
+#            a: 0b0110100101010010 = 0x6952
+#            b: 0b0110100101000011 = 0x6943
+ld x, 0x6952
+ld y, x
+ld x, 0x6943
+xor x, y
+out 0, x
+
+# 18: relative jump
+ld r0, 18
+jr+ 3
+ld r0, 0
 out 0, r0

@@ -14,9 +14,40 @@ out i8l, x: # Output <tt>x</tt> to address <tt>i8l</tt>.
 ld x, i8l: # Load <tt>i8l</tt> into <tt>x</tt>.
     IOL XI P+1
 
+ld x, i16l: # Load <tt>i16l</tt> into <tt>x</tt>.
+    PO AI
+    MO16L XI P+2
+
+ld y, x: # Load <tt>x</tt> into <tt>y</tt>.
+    YI XO
+
 add x, i8l: # Add <tt>i8l</tt> to <tt>x</tt>.
     IOL YI P+1
     XI X+Y 
+
+ld x, (i8h+i8l): # Load the value at (r)+i8l into x.
+    IOH AI P+1
+    MO32 YI
+    PO AI
+    MO8L XI P+1
+    XI X+Y
+    XO AI
+    MO32 XI
+
+ld x, ((i8h)++), i8l: # Load the byte at (r) into x. Advance the pointer stored in r by i8l.
+    IOH AI P+1
+    MO32 YI
+    PO AI
+    MO8L XI P+1
+    XI X+Y
+    IOH AI
+    XO MI32
+    YO AI
+    MO8L XI
+
+add x, y: # Add <tt>y</tt> to <tt>x</tt>.
+    XI X+Y
+
 
 sub x, i8l: # Subtract <tt>i8l</tt> from <tt>x</tt>.
     IOL YI P+1
@@ -27,6 +58,11 @@ inc x: # Increment <tt>x</tt>.
 
 dec x: # Decrement <tt>x</tt>.
     XI X-1 
+
+dec (i8h): # Decrement <tt>r</tt>.
+    IOH AI P+1
+    MO32 YI
+    MI32 Y-1
 
 shl x: # Bitwise shift-left <tt>x</tt> by 1 place.
     YI X
@@ -157,6 +193,13 @@ jnz i32: # Jump to <tt>i32</tt> if <tt>Z</tt> is not set.
     PO AI
     MO32 JNZ P+4
 
+jr+ i8l: # Jump forwards relative to the address of the next instruction. <tt>jr+ 0</tt> is a no-op.
+    P+1
+    PO YI
+    IOL XI 
+    JMP X+Y
+
+
 out i32, (i8h): # Output <tt>r</tt> to address <tt>i32</tt>.
     # byte-order: 1,0
     PO AI
@@ -165,23 +208,14 @@ out i32, (i8h): # Output <tt>r</tt> to address <tt>i32</tt>.
     YO AI
     DI YO
 
-tbsz (i8h), i32: # Test bits: if none of the bits set in <tt>i32</tt> are also set in <tt>r</tt>, skip the next instruction (intended to be a paired <tt>sb</tt> call). Use in tandem with <tt>sb</tt> to compute bitwise shift-right of 8 or more bits.
-    # clobbers: r63
-    # implicit: r63
+tbsz (i8h), i32: # Test bits: if none of the bits set in <tt>i32</tt> are also set in <tt>r</tt>, skip the next <tt>sb</tt>. Use in tandem with <tt>sb</tt> to compute bitwise shift-right of 8 or more bits.
     IOH AI P+1
     MO32 XI
     PO AI
     MO32 YI P+4
     X&Y
-    PO AI
-    MO8H XI P+1
-    PO YI
-    YI Y+1
-    YI Y+1
-    YI Y+1
-    XO AI
-    YO MI32
-    MO32 JZ
+    PO JNZ P+2
+    PO JNZ P+2
 
 sb (i8h), i8l: # Set bits in the register at <tt>r</tt> based on <tt>i8l</tt>. i.e. <tt>r |= i8l</tt>.
     IOH AI P+1
