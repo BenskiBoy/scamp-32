@@ -1,3 +1,20 @@
+ld sp, 2048
+ld iv, int_handler
+ld x, iv
+out 0, x
+
+ien
+
+jmp post_int_handler
+
+int_handler:
+    ld x, 69
+    out 0, x
+    ien
+    reti
+
+post_int_handler:
+
 # 0
 ld x, 0
 out 0, x

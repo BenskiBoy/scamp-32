@@ -127,7 +127,7 @@ class Assembler:
     # 1(x) => 1
     # 2(sp) => 2
     def arg2num(self, arg):
-        if re.match(r"^(x|y|sp|pc)$", arg):
+        if re.match(r"^(x|y|sp|pc|iv)$", arg):
             self.die(f"can't convert register to number: {arg}")
 
         m = re.search(r"(\d+)\(x\)", arg)
@@ -167,7 +167,7 @@ class Assembler:
 
         def subst(m):
             v = m.group(1)
-            if re.match(r"^(x|y|sp|pc)$", v):
+            if re.match(r"^(x|y|sp|pc|iv)$", v):
                 return v
             if re.match(r"^\d+$", v):
                 n = int(v)
@@ -192,7 +192,7 @@ class Assembler:
     def namearg(self, arg):
         if not re.match(r"^[a-z_][a-z_0-9]*$", arg, re.IGNORECASE):
             self.die(f"invalid name: {arg}")
-        if re.match(r"^(x|y|sp)$", arg, re.IGNORECASE):
+        if re.match(r"^(x|y|sp|iv)$", arg, re.IGNORECASE):
             self.die(f"'{arg}' is a reserved name")
         return arg
 

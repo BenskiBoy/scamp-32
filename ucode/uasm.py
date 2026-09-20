@@ -262,16 +262,15 @@ def encode(uinstr, mnemonic, lineno):
 def emit_ucode(for_mnemonic, ucode, lineno):
     ucode = list(ucode)
 
-    # confusing: always fetch the next instruction and increment PC, regardless of whatever
-    # the last instruction was -- except for "irq", a hardware-only entry point that the
-    # interrupt logic jumps to directly (forcing the instruction register's value itself),
-    # so it must not perform its own fetch: doing so would fetch and execute whatever
-    # instruction happened to come next, instead of running the interrupt handler.
-    if not (for_mnemonic is not None and for_mnemonic == "irq"):
-        ucode = [
-            encode("PO AI", for_mnemonic, lineno),
-            encode("MO16L II P+1", for_mnemonic, lineno),
-        ] + ucode
+    # Always prepend the standard 2-word fetch prologue, "irq" included -- the hardware
+    # consumes T0/T1 regardless of what's in the ROM there (for "irq" it overrides T1
+    # instead of reading it), so skipping this for "irq" just shifts its real microcode
+    # off by 2 T-states instead of actually avoiding anything. See doc/UCODE.md
+    # "Extensibility".
+    ucode = [
+        encode("PO AI", for_mnemonic, lineno),
+        encode("MO16L II P+1", for_mnemonic, lineno),
+    ] + ucode
 
     # pad the rest of the ucode with "reset t-state" microcode
     while len(ucode) < T_STATES:

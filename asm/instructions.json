@@ -15,7 +15,7 @@
     },
     "add (i8h), i32": {
         "cycles": 16,
-        "opcode": 17,
+        "opcode": 21,
         "remark": "Add <tt>i32</tt> to <tt>r</tt>.",
         "ucode": [
             "P+1",
@@ -28,7 +28,7 @@
     },
     "add (i8h), x": {
         "cycles": 16,
-        "opcode": 18,
+        "opcode": 22,
         "remark": "Add <tt>x</tt> to <tt>r</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -48,7 +48,7 @@
     },
     "add x, i8l": {
         "cycles": 16,
-        "opcode": 16,
+        "opcode": 20,
         "remark": "Add <tt>i8l</tt> to <tt>x</tt>.",
         "ucode": [
             "IOL YI P+1",
@@ -57,7 +57,7 @@
     },
     "add x, y": {
         "cycles": 16,
-        "opcode": 21,
+        "opcode": 25,
         "remark": "Add <tt>y</tt> to <tt>x</tt>.",
         "ucode": [
             "XI X+Y"
@@ -98,7 +98,7 @@
     },
     "and x, (i8h)": {
         "cycles": 16,
-        "opcode": 28,
+        "opcode": 32,
         "remark": "AND <tt>r</tt> with <tt>x</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -108,7 +108,7 @@
     },
     "and x, i8l": {
         "cycles": 16,
-        "opcode": 27,
+        "opcode": 31,
         "remark": "AND <tt>i8l</tt> with <tt>x</tt>.",
         "ucode": [
             "IOL YI P+1",
@@ -118,7 +118,7 @@
     "call (i32)": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 63,
+        "opcode": 67,
         "remark": "Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4. Jump to the address stored at <tt>(i32)</tt>.",
         "ucode": [
             "P+4",
@@ -139,7 +139,7 @@
     "call i32": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 62,
+        "opcode": 66,
         "remark": "Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4. Jump to <tt>i32</tt>.",
         "ucode": [
             "P+4",
@@ -157,7 +157,7 @@
     },
     "dec (i8h)": {
         "cycles": 16,
-        "opcode": 25,
+        "opcode": 29,
         "remark": "Decrement <tt>r</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -167,15 +167,31 @@
     },
     "dec x": {
         "cycles": 16,
-        "opcode": 24,
+        "opcode": 28,
         "remark": "Decrement <tt>x</tt>.",
         "ucode": [
             "XI X-1"
         ]
     },
+    "ids": {
+        "cycles": 16,
+        "opcode": 9,
+        "remark": "Disable interrupts.",
+        "ucode": [
+            "IDS"
+        ]
+    },
+    "ien": {
+        "cycles": 16,
+        "opcode": 8,
+        "remark": "Enable interrupts.",
+        "ucode": [
+            "IEN"
+        ]
+    },
     "inc (i8h)": {
         "cycles": 16,
-        "opcode": 48,
+        "opcode": 52,
         "remark": "Increment <tt>r</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -185,15 +201,29 @@
     },
     "inc x": {
         "cycles": 16,
-        "opcode": 23,
+        "opcode": 27,
         "remark": "Increment <tt>x</tt>.",
         "ucode": [
             "XI X+1"
         ]
     },
+    "irq": {
+        "cycles": 16,
+        "opcode": 71,
+        "remark": "Hardware interrupt entry point (never called directly -- see doc/UCODE.md \"Extensibility\"). Disables interrupts (re-enable with <tt>ien</tt> once safe -- otherwise the handler's own first fetch would immediately re-trigger irq). Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4 (width muxed in alongside the forced opcode, read via IOL). Jump to the address in the interrupt vector register.",
+        "ucode": [
+            "IDS",
+            "SO YI",
+            "YO AI",
+            "PO MI32",
+            "IOL XI",
+            "Y-X SI",
+            "IVO JMP"
+        ]
+    },
     "jmp i32": {
         "cycles": 16,
-        "opcode": 41,
+        "opcode": 45,
         "remark": "Jump to <tt>i32</tt>.",
         "ucode": [
             "PO AI",
@@ -202,7 +232,7 @@
     },
     "jnz i32": {
         "cycles": 16,
-        "opcode": 52,
+        "opcode": 56,
         "remark": "Jump to <tt>i32</tt> if <tt>Z</tt> is not set.",
         "ucode": [
             "PO AI",
@@ -211,7 +241,7 @@
     },
     "jr+ i8l": {
         "cycles": 16,
-        "opcode": 53,
+        "opcode": 57,
         "remark": "Jump forwards relative to the address of the next instruction. <tt>jr+ 0</tt> is a no-op.",
         "ucode": [
             "P+1",
@@ -222,7 +252,7 @@
     },
     "jr- i8l": {
         "cycles": 16,
-        "opcode": 54,
+        "opcode": 58,
         "remark": "Jump backwards relative to the address of the next instruction. <tt>jr- 0</tt> is a no-op. <tt>jr- 1</tt> is an infinite loop.",
         "ucode": [
             "P+1",
@@ -233,7 +263,7 @@
     },
     "jz i32": {
         "cycles": 16,
-        "opcode": 55,
+        "opcode": 59,
         "remark": "Jump to <tt>i32</tt> if <tt>Z</tt> is set.",
         "ucode": [
             "PO AI",
@@ -242,7 +272,7 @@
     },
     "ld (i32), x": {
         "cycles": 16,
-        "opcode": 10,
+        "opcode": 14,
         "remark": "Load <tt>x</tt> into the value in <tt>(i32)</tt>.",
         "ucode": [
             "PO AI",
@@ -252,7 +282,7 @@
     },
     "ld (i8h), (i8h)": {
         "cycles": 16,
-        "opcode": 46,
+        "opcode": 50,
         "remark": "Load the value in the second <tt>r</tt> into the first <tt>r</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -265,7 +295,7 @@
     },
     "ld (i8h), i16l": {
         "cycles": 16,
-        "opcode": 43,
+        "opcode": 47,
         "remark": "Load <tt>i16</tt> into <tt>r</tt>.",
         "ucode": [
             "P+1",
@@ -277,7 +307,7 @@
     },
     "ld (i8h), i32": {
         "cycles": 16,
-        "opcode": 44,
+        "opcode": 48,
         "remark": "Load <tt>i32</tt> into <tt>r</tt>.",
         "ucode": [
             "P+1",
@@ -289,7 +319,7 @@
     },
     "ld (i8h), i8l": {
         "cycles": 16,
-        "opcode": 42,
+        "opcode": 46,
         "remark": "Load <tt>i8</tt> into <tt>r</tt>.",
         "ucode": [
             "P+1",
@@ -301,11 +331,20 @@
     },
     "ld (i8h), x": {
         "cycles": 16,
-        "opcode": 45,
+        "opcode": 49,
         "remark": "Load <tt>x</tt> into <tt>r</tt>.",
         "ucode": [
             "IOH AI P+1",
             "MI32 XO"
+        ]
+    },
+    "ld iv, i32": {
+        "cycles": 16,
+        "opcode": 6,
+        "remark": "Load <tt>i32</tt> into the interrupt vector register.",
+        "ucode": [
+            "PO AI",
+            "MO32 IVI P+4"
         ]
     },
     "ld sp, i32": {
@@ -319,7 +358,7 @@
     },
     "ld x, ((i8h)++), i8l": {
         "cycles": 16,
-        "opcode": 20,
+        "opcode": 24,
         "remark": "Load the byte at (r) into x. Advance the pointer stored in r by i8l.",
         "ucode": [
             "IOH AI P+1",
@@ -335,7 +374,7 @@
     },
     "ld x, (i8h)": {
         "cycles": 16,
-        "opcode": 9,
+        "opcode": 13,
         "remark": "Load <tt>r</tt> into <tt>x</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -344,7 +383,7 @@
     },
     "ld x, (i8h+i8l)": {
         "cycles": 16,
-        "opcode": 19,
+        "opcode": 23,
         "remark": "Load the value at (r)+i8l into x.",
         "ucode": [
             "IOH AI P+1",
@@ -358,7 +397,7 @@
     },
     "ld x, i16l": {
         "cycles": 16,
-        "opcode": 13,
+        "opcode": 17,
         "remark": "Load <tt>i16l</tt> into <tt>x</tt>.",
         "ucode": [
             "PO AI",
@@ -367,7 +406,7 @@
     },
     "ld x, i32": {
         "cycles": 16,
-        "opcode": 14,
+        "opcode": 18,
         "remark": "Load <tt>i32l</tt> into <tt>x</tt>.",
         "ucode": [
             "PO AI",
@@ -376,15 +415,23 @@
     },
     "ld x, i8l": {
         "cycles": 16,
-        "opcode": 12,
+        "opcode": 16,
         "remark": "Load <tt>i8l</tt> into <tt>x</tt>.",
         "ucode": [
             "IOL XI P+1"
         ]
     },
+    "ld x, iv": {
+        "cycles": 16,
+        "opcode": 7,
+        "remark": "Load the interrupt vector register into <tt>x</tt>.",
+        "ucode": [
+            "IVO XI"
+        ]
+    },
     "ld y, i16l": {
         "cycles": 16,
-        "opcode": 31,
+        "opcode": 35,
         "remark": "Load <tt>i16</tt> into <tt>y</tt>.",
         "ucode": [
             "PO AI",
@@ -393,7 +440,7 @@
     },
     "ld y, x": {
         "cycles": 16,
-        "opcode": 15,
+        "opcode": 19,
         "remark": "Load <tt>x</tt> into <tt>y</tt>.",
         "ucode": [
             "YI XO"
@@ -401,7 +448,7 @@
     },
     "ld16 x, i8l(sp)": {
         "cycles": 16,
-        "opcode": 7,
+        "opcode": 11,
         "remark": "Load the 16-bit value at <tt>(sp+i8l)</tt> into <tt>x</tt>.",
         "ucode": [
             "SO YI",
@@ -413,7 +460,7 @@
     },
     "ld32 x, i8l(sp)": {
         "cycles": 16,
-        "opcode": 8,
+        "opcode": 12,
         "remark": "Load the 32-bit value at <tt>(sp+i8l)</tt> into <tt>x</tt>.",
         "ucode": [
             "SO YI",
@@ -425,7 +472,7 @@
     },
     "ld8 x, i8l(sp)": {
         "cycles": 16,
-        "opcode": 6,
+        "opcode": 10,
         "remark": "Load the byte value at <tt>(sp+i8l)</tt> into <tt>x</tt>.",
         "ucode": [
             "SO YI",
@@ -437,7 +484,7 @@
     },
     "or x, i8l": {
         "cycles": 16,
-        "opcode": 29,
+        "opcode": 33,
         "remark": "OR <tt>i8l</tt> into <tt>x</tt>.",
         "ucode": [
             "IOL YI P+1",
@@ -450,7 +497,7 @@
             0
         ],
         "cycles": 16,
-        "opcode": 56,
+        "opcode": 60,
         "remark": "Output <tt>r</tt> to address <tt>i32</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -462,7 +509,7 @@
     },
     "out i8l, x": {
         "cycles": 16,
-        "opcode": 11,
+        "opcode": 15,
         "remark": "Output <tt>x</tt> to address <tt>i8l</tt>.",
         "ucode": [
             "IOL AI P+1",
@@ -475,7 +522,7 @@
             0
         ],
         "cycles": 16,
-        "opcode": 58,
+        "opcode": 62,
         "remark": "Output the 16-bit value at <tt>(r)</tt> to address <tt>i32</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -492,7 +539,7 @@
             0
         ],
         "cycles": 16,
-        "opcode": 59,
+        "opcode": 63,
         "remark": "Output the 32-bit value at <tt>(r)</tt> to address <tt>i32</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -509,7 +556,7 @@
             0
         ],
         "cycles": 16,
-        "opcode": 57,
+        "opcode": 61,
         "remark": "Output the byte value at <tt>(r)</tt> to address <tt>i32</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -523,7 +570,7 @@
     "pop16 x": {
         "cycles": 16,
         "implicit_byte": 2,
-        "opcode": 39,
+        "opcode": 43,
         "remark": "Pre-increment <tt>sp</tt> by 2. Load <tt>x</tt> from the low 16 bits of the value in <tt>(sp)</tt>.",
         "ucode": [
             "SO YI",
@@ -537,7 +584,7 @@
     "pop32 x": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 40,
+        "opcode": 44,
         "remark": "Pre-increment <tt>sp</tt> by 4. Load <tt>x</tt> from the value in <tt>(sp)</tt>.",
         "ucode": [
             "SO YI",
@@ -551,7 +598,7 @@
     "pop8 x": {
         "cycles": 16,
         "implicit_byte": 1,
-        "opcode": 38,
+        "opcode": 42,
         "remark": "Pre-increment <tt>sp</tt> by 1. Load <tt>x</tt> from the low byte of the value in <tt>(sp)</tt>.",
         "ucode": [
             "SO YI",
@@ -565,7 +612,7 @@
     "push16 i16l": {
         "cycles": 16,
         "implicit_byte": 2,
-        "opcode": 33,
+        "opcode": 37,
         "remark": "Store <tt>i16l</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 2.",
         "ucode": [
             "PO AI",
@@ -581,7 +628,7 @@
     "push16 x": {
         "cycles": 16,
         "implicit_byte": 2,
-        "opcode": 36,
+        "opcode": 40,
         "remark": "Store the low 16 bits of <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 2.",
         "ucode": [
             "SO YI",
@@ -594,7 +641,7 @@
     "push32 i32": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 34,
+        "opcode": 38,
         "remark": "Store <tt>i32</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4.",
         "ucode": [
             "PO AI",
@@ -610,7 +657,7 @@
     "push32 x": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 37,
+        "opcode": 41,
         "remark": "Store <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4.",
         "ucode": [
             "SO YI",
@@ -623,7 +670,7 @@
     "push8 i8l": {
         "cycles": 16,
         "implicit_byte": 1,
-        "opcode": 32,
+        "opcode": 36,
         "remark": "Store <tt>i8l</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 1.",
         "ucode": [
             "SO YI P+1",
@@ -637,7 +684,7 @@
     "push8 x": {
         "cycles": 16,
         "implicit_byte": 1,
-        "opcode": 35,
+        "opcode": 39,
         "remark": "Store the low byte of <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 1.",
         "ucode": [
             "SO YI",
@@ -650,7 +697,7 @@
     "ret": {
         "cycles": 16,
         "implicit_byte": 4,
-        "opcode": 64,
+        "opcode": 68,
         "remark": "Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt> and jump to it.",
         "ucode": [
             "SO YI",
@@ -663,7 +710,7 @@
     },
     "ret i8l": {
         "cycles": 16,
-        "opcode": 65,
+        "opcode": 70,
         "remark": "Pop the return address off <tt>(sp)</tt> and jump to it, then discard <tt>i8l</tt> further bytes of caller-pushed arguments (i.e. pre-increment <tt>sp</tt> by <tt>4+i8l</tt>).",
         "ucode": [
             "SO YI",
@@ -678,9 +725,23 @@
             "MO32 JMP"
         ]
     },
+    "reti": {
+        "cycles": 16,
+        "implicit_byte": 4,
+        "opcode": 69,
+        "remark": "Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt>, re-enable interrupts, and jump to it. Use to return from an interrupt handler entered via <tt>irq</tt>.",
+        "ucode": [
+            "SO YI",
+            "IOL XI P+1",
+            "Y+X YI",
+            "YO SI",
+            "YO AI",
+            "MO32 JMP"
+        ]
+    },
     "sb (i8h), i8l": {
         "cycles": 16,
-        "opcode": 61,
+        "opcode": 65,
         "remark": "Set bits in the register at <tt>r</tt> based on <tt>i8l</tt>. i.e. <tt>r |= i8l</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -693,7 +754,7 @@
     },
     "shl (i8h)": {
         "cycles": 16,
-        "opcode": 47,
+        "opcode": 51,
         "remark": "Bitwise shift-left <tt>r</tt> by 1 place.",
         "ucode": [
             "IOH AI P+1",
@@ -704,7 +765,7 @@
     },
     "shl x": {
         "cycles": 16,
-        "opcode": 26,
+        "opcode": 30,
         "remark": "Bitwise shift-left <tt>x</tt> by 1 place.",
         "ucode": [
             "YI X",
@@ -713,7 +774,7 @@
     },
     "sub x, i8l": {
         "cycles": 16,
-        "opcode": 22,
+        "opcode": 26,
         "remark": "Subtract <tt>i8l</tt> from <tt>x</tt>.",
         "ucode": [
             "IOL YI P+1",
@@ -722,7 +783,7 @@
     },
     "tbsz (i8h), i32": {
         "cycles": 16,
-        "opcode": 60,
+        "opcode": 64,
         "remark": "Test bits: if none of the bits set in <tt>i32</tt> are also set in <tt>r</tt>, skip the next <tt>sb</tt>. Use in tandem with <tt>sb</tt> to compute bitwise shift-right of 8 or more bits.",
         "ucode": [
             "IOH AI P+1",
@@ -736,7 +797,7 @@
     },
     "test16 ((i8h))": {
         "cycles": 16,
-        "opcode": 50,
+        "opcode": 54,
         "remark": "Set flags based on the 16-bit value at <tt>(r)</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -747,7 +808,7 @@
     },
     "test32 ((i8h))": {
         "cycles": 16,
-        "opcode": 51,
+        "opcode": 55,
         "remark": "Set flags based on the 32-bit value at <tt>(r)</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -758,7 +819,7 @@
     },
     "test8 ((i8h))": {
         "cycles": 16,
-        "opcode": 49,
+        "opcode": 53,
         "remark": "Set flags based on the byte value at <tt>(r)</tt>.",
         "ucode": [
             "IOH AI P+1",
@@ -773,7 +834,7 @@
         ],
         "cycles": 16,
         "implicit_reg": 62,
-        "opcode": 30,
+        "opcode": 34,
         "remark": "XOR <tt>y</tt> with <tt>x</tt>.",
         "ucode": [
             "IOH AI P+1",
