@@ -1,0 +1,390 @@
+<html>
+<head>
+<title>SCAMP-32 Instruction Set Cheatsheet</title>
+<style type="text/css">
+body {
+    font-family: sans-serif;
+}
+table {
+    margin-right: 150px;
+    font-size: 1.0em;
+    font-family: monospace;
+}
+td {
+    background-color: #ccc;
+    color: black;
+    padding: 2px;
+    vertical-align: top;
+}
+td.inst-add { background-color: #dcc; }
+td.inst-cmp { background-color: #dbb; }
+td.inst-inc { background-color: #cbb; }
+td.inst-sub { background-color: #cdc; }
+td.inst-dec { background-color: #bcb; }
+td.inst-and { background-color: #ccd; }
+td.inst-not { background-color: #dcb; }
+td.inst-test { background-color: #bdd; }
+td.inst-neg { background-color: #dbd; }
+td.inst-or { background-color: #ddc; }
+td.inst-nand { background-color: #cdd; }
+td.inst-nor { background-color: #dcd; }
+td.inst-xor { background-color: #bcd; }
+td.inst-in { background-color: #cbc; }
+td.inst-out { background-color: #bdc; }
+td.inst-ld { background-color: #bcc; }
+td.inst-push, td.inst-pop { background-color: #bbc; }
+td.inst-j { background-color: #ccb; }
+td.inst-shl, td.inst-shl2, td.inst-shl3 { background-color: #cbd; }
+td.inst-tbsz { background-color: #cdb; }
+td.inst-call, td.inst-ret { background-color: #dbc; }
+
+td.inst:hover {
+    background-color: #eee;
+}
+td.inst:hover div.popup {
+    display: block;
+}
+td.inst div.popup {
+    display:none;
+}
+div.popup {
+    pointer-events: none;
+    position: absolute;
+    background: #eee;
+    width: 200px;
+    padding: 2px;
+}
+th {
+    background-color: #333;
+    color: white;
+    padding: 2px;
+}
+.clobflags {
+    color: #080;
+}
+.clobx {
+    color: #f00;
+    font-weight: bold;
+}
+.cloby {
+    color: #888;
+}
+.remark {
+    font-family: sans-serif;
+    font-size: 0.8em;
+}
+tt {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+</style>
+</head>
+<body>
+<h1>SCAMP-32 Instruction Set Cheatsheet</h1>
+<ul>
+<li>The bus and registers are 32 bits wide. <tt>i8l</tt>/<tt>i16l</tt> parameters are zero-extended
+onto the bus; <tt>i8h</tt>/<tt>i16h</tt> are extended with the upper bits set to 1 instead
+(e.g. so a pseudo-register's address, top of memory, fits in a single byte operand).</li>
+<li>Typically the first parameter is the destination and first operand, and the second parameter is the other operand.</li>
+<li>Side effects on <tt>flags</tt>, <tt>x</tt>, or <tt>y</tt> are documented as "clobbers", derived
+automatically from whether an instruction's own microcode writes <tt>x</tt>/<tt>y</tt> or uses the ALU.
+A clobber of some other register (e.g. a scratch register touched via a computed address) is called out
+explicitly with a <tt># clobbers: rN</tt> comment in <tt>ucode.s</tt> instead, since that can't be
+derived from a token scan.</li>
+<li><tt>++</tt> refers to post-increment of a pointer stored in a register.</li>
+</ul>
+<table>
+<tr><td></td><th>_0</th><th>_1</th><th>_2</th><th>_3</th><th>_4</th><th>_5</th><th>_6</th><th>_7</th><th>_8</th><th>_9</th><th>_a</th><th>_b</th><th>_c</th><th>_d</th><th>_e</th><th>_f</th></tr>
+<tr><th>0_</th><td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> x, r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 00<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;MO8H AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add <tt>r</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-add8"><div style="padding:2px"><span style="font-weight:bold">add8</span> x, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 01<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO8L YI<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add the byte value at <tt>(r)</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-add16"><div style="padding:2px"><span style="font-weight:bold">add16</span> x, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 02<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO16L YI<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add the 16-bit value at <tt>(r)</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-add32"><div style="padding:2px"><span style="font-weight:bold">add32</span> x, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 03<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add the 32-bit value at <tt>(r)</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> r, (i32) <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 04<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;MI32 <span class="clobflags">Y+X</span><br><span class="remark">Add <tt>(i32)</tt> to the value in <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> sp, i32 </div><div class="popup"><b>Opcode:</b> 05<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 SI P+4<br><span class="remark">Load <tt>i32</tt> into <tt>sp</tt>.</span></div></td>
+<td class="inst inst-ld8"><div style="padding:2px"><span style="font-weight:bold">ld8</span> x, i8l(sp) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 06<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;<span class="clobflags">XO</span> AI<br>&nbsp;&nbsp;MO8L XI<br><span class="remark">Load the byte value at <tt>(sp+i8l)</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld16"><div style="padding:2px"><span style="font-weight:bold">ld16</span> x, i8l(sp) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 07<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;<span class="clobflags">XO</span> AI<br>&nbsp;&nbsp;MO16L XI<br><span class="remark">Load the 16-bit value at <tt>(sp+i8l)</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld32"><div style="padding:2px"><span style="font-weight:bold">ld32</span> x, i8l(sp) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 08<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;<span class="clobflags">XO</span> AI<br>&nbsp;&nbsp;MO32 XI<br><span class="remark">Load the 32-bit value at <tt>(sp+i8l)</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, r </div><div class="popup"><b>Opcode:</b> 09<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 XI<br><span class="remark">Load <tt>r</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> (i32), x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 0a<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;MI32 <span class="clobflags">XO</span><br><span class="remark">Load <tt>x</tt> into the value in <tt>(i32)</tt>.</span></div></td>
+<td class="inst inst-out"><div style="padding:2px"><span style="font-weight:bold">out</span> i8l, x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 0b<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOL AI P+1<br>&nbsp;&nbsp;<span class="clobflags">XO</span> DI<br><span class="remark">Output <tt>x</tt> to address <tt>i8l</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, i8l </div><div class="popup"><b>Opcode:</b> 0c<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;IOL XI P+1<br><span class="remark">Load <tt>i8l</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, i16l </div><div class="popup"><b>Opcode:</b> 0d<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO16L XI P+2<br><span class="remark">Load <tt>i16l</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, i32 </div><div class="popup"><b>Opcode:</b> 0e<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 XI P+4<br><span class="remark">Load <tt>i32l</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> y, x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 0f<br><b>Bytes:</b> 1<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;YI <span class="clobflags">XO</span><br><span class="remark">Load <tt>x</tt> into <tt>y</tt>.</span></div></td>
+</tr>
+<tr><th>1_</th><td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> x, i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 10<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOL YI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add <tt>i8l</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> r, i32 <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 11<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 YI P+4<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;MI32 <span class="clobflags">Y+X</span><br><span class="remark">Add <tt>i32</tt> to <tt>r</tt>.</span></div></td>
+<td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> r, x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 12<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;MI32 <span class="clobflags">Y+X</span><br><span class="remark">Add <tt>x</tt> to <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, (i8h+i8l) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 13<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;<span class="clobflags">XO</span> AI<br>&nbsp;&nbsp;MO32 XI<br><span class="remark">Load the value at (r)+i8l into x.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> x, (r++), i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 14<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI32<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO8L XI<br><span class="remark">Load the byte at (r) into x. Advance the pointer stored in r by i8l.</span></div></td>
+<td class="inst inst-add"><div style="padding:2px"><span style="font-weight:bold">add</span> x, y <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 15<br><b>Bytes:</b> 1<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Add <tt>y</tt> to <tt>x</tt>.</span></div></td>
+<td class="inst inst-sub"><div style="padding:2px"><span style="font-weight:bold">sub</span> x, i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 16<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOL YI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X-Y</span><br><span class="remark">Subtract <tt>i8l</tt> from <tt>x</tt>.</span></div></td>
+<td class="inst inst-inc"><div style="padding:2px"><span style="font-weight:bold">inc</span> x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 17<br><b>Bytes:</b> 1<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;XI <span class="clobflags">X+1</span><br><span class="remark">Increment <tt>x</tt>.</span></div></td>
+<td class="inst inst-dec"><div style="padding:2px"><span style="font-weight:bold">dec</span> x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 18<br><b>Bytes:</b> 1<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;XI <span class="clobflags">X-1</span><br><span class="remark">Decrement <tt>x</tt>.</span></div></td>
+<td class="inst inst-dec"><div style="padding:2px"><span style="font-weight:bold">dec</span> r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 19<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;MI32 <span class="clobflags">Y-1</span><br><span class="remark">Decrement <tt>r</tt>.</span></div></td>
+<td class="inst inst-shl"><div style="padding:2px"><span style="font-weight:bold">shl</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 1a<br><b>Bytes:</b> 1<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;YI <span class="clobflags">X</span><br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br><span class="remark">Bitwise shift-left <tt>x</tt> by 1 place.</span></div></td>
+<td class="inst inst-and"><div style="padding:2px"><span style="font-weight:bold">and</span> x, i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 1b<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOL YI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X&amp;Y</span><br><span class="remark">AND <tt>i8l</tt> with <tt>x</tt>.</span></div></td>
+<td class="inst inst-and"><div style="padding:2px"><span style="font-weight:bold">and</span> x, r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 1c<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;XI <span class="clobflags">X&amp;Y</span><br><span class="remark">AND <tt>r</tt> with <tt>x</tt>.</span></div></td>
+<td class="inst inst-or"><div style="padding:2px"><span style="font-weight:bold">or</span> x, i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 1d<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOL YI P+1<br>&nbsp;&nbsp;XI <span class="clobflags">X|Y</span><br><span class="remark">OR <tt>i8l</tt> into <tt>x</tt>.</span></div></td>
+<td class="inst inst-xor"><div style="padding:2px"><span style="font-weight:bold">xor</span> x, y <span class="clobflags">+</span><span class="clobr62">*</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 1e<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobr62">r62</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MI32 <span class="clobflags">X|Y</span><br>&nbsp;&nbsp;YI <span class="clobflags">~(X&amp;Y)</span><br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;XI <span class="clobflags">X&amp;Y</span><br><span class="remark">XOR <tt>y</tt> with <tt>x</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> y, i16l </div><div class="popup"><b>Opcode:</b> 1f<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO16L YI P+2<br><span class="remark">Load <tt>i16</tt> into <tt>y</tt>.</span></div></td>
+</tr>
+<tr><th>2_</th><td class="inst inst-push8"><div style="padding:2px"><span style="font-weight:bold">push8</span> i8l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 20<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI P+1<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MI8 IOL<br>&nbsp;&nbsp;PO AI P+1<br>&nbsp;&nbsp;MO8L XI<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store <tt>i8l</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 1.</span></div></td>
+<td class="inst inst-push16"><div style="padding:2px"><span style="font-weight:bold">push16</span> i16l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 21<br><b>Bytes:</b> 4<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO16L XI P+2<br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI16<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store <tt>i16l</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 2.</span></div></td>
+<td class="inst inst-push32"><div style="padding:2px"><span style="font-weight:bold">push32</span> i32 <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 22<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 XI P+4<br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI32<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store <tt>i32</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4.</span></div></td>
+<td class="inst inst-push8"><div style="padding:2px"><span style="font-weight:bold">push8</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 23<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI8<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store the low byte of <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 1.</span></div></td>
+<td class="inst inst-push16"><div style="padding:2px"><span style="font-weight:bold">push16</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 24<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI16<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store the low 16 bits of <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 2.</span></div></td>
+<td class="inst inst-push32"><div style="padding:2px"><span style="font-weight:bold">push32</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 25<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;<span class="clobflags">XO</span> MI32<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br><span class="remark">Store <tt>x</tt> to the value in <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4.</span></div></td>
+<td class="inst inst-pop8"><div style="padding:2px"><span style="font-weight:bold">pop8</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 26<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y+X</span> YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> SI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO8L XI<br><span class="remark">Pre-increment <tt>sp</tt> by 1. Load <tt>x</tt> from the low byte of the value in <tt>(sp)</tt>.</span></div></td>
+<td class="inst inst-pop16"><div style="padding:2px"><span style="font-weight:bold">pop16</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 27<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y+X</span> YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> SI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO16L XI<br><span class="remark">Pre-increment <tt>sp</tt> by 2. Load <tt>x</tt> from the low 16 bits of the value in <tt>(sp)</tt>.</span></div></td>
+<td class="inst inst-pop32"><div style="padding:2px"><span style="font-weight:bold">pop32</span> x <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 28<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y+X</span> YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> SI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO32 XI<br><span class="remark">Pre-increment <tt>sp</tt> by 4. Load <tt>x</tt> from the value in <tt>(sp)</tt>.</span></div></td>
+<td class="inst inst-j"><div style="padding:2px"><span style="font-weight:bold">jmp</span> i32 </div><div class="popup"><b>Opcode:</b> 29<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 JMP<br><span class="remark">Jump to <tt>i32</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> r, i8l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 2a<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L YI P+1<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MI32 <span class="clobflags">YO</span><br><span class="remark">Load <tt>i8</tt> into <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> r, i16l <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 2b<br><b>Bytes:</b> 4<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO16L YI P+2<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MI32 <span class="clobflags">YO</span><br><span class="remark">Load <tt>i16</tt> into <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> r, i32 <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 2c<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 YI P+4<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MI32 <span class="clobflags">YO</span><br><span class="remark">Load <tt>i32</tt> into <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> r, x <span class="clobflags">+</span></div><div class="popup"><b>Opcode:</b> 2d<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MI32 <span class="clobflags">XO</span><br><span class="remark">Load <tt>x</tt> into <tt>r</tt>.</span></div></td>
+<td class="inst inst-ld"><div style="padding:2px"><span style="font-weight:bold">ld</span> r, r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 2e<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8H AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MI32 <span class="clobflags">YO</span><br><span class="remark">Load the value in the second <tt>r</tt> into the first <tt>r</tt>.</span></div></td>
+<td class="inst inst-shl"><div style="padding:2px"><span style="font-weight:bold">shl</span> r <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 2f<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;YI <span class="clobflags">X</span><br>&nbsp;&nbsp;MI32 <span class="clobflags">X+Y</span><br><span class="remark">Bitwise shift-left <tt>r</tt> by 1 place.</span></div></td>
+</tr>
+<tr><th>3_</th><td class="inst inst-inc"><div style="padding:2px"><span style="font-weight:bold">inc</span> r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 30<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;MI32 <span class="clobflags">Y+1</span><br><span class="remark">Increment <tt>r</tt>.</span></div></td>
+<td class="inst inst-test8"><div style="padding:2px"><span style="font-weight:bold">test8</span> (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 31<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO8L YI<br>&nbsp;&nbsp;<span class="clobflags">Y</span><br><span class="remark">Set flags based on the byte value at <tt>(r)</tt>.</span></div></td>
+<td class="inst inst-test16"><div style="padding:2px"><span style="font-weight:bold">test16</span> (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 32<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO16L YI<br>&nbsp;&nbsp;<span class="clobflags">Y</span><br><span class="remark">Set flags based on the 16-bit value at <tt>(r)</tt>.</span></div></td>
+<td class="inst inst-test32"><div style="padding:2px"><span style="font-weight:bold">test32</span> (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 33<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;<span class="clobflags">Y</span><br><span class="remark">Set flags based on the 32-bit value at <tt>(r)</tt>.</span></div></td>
+<td class="inst inst-j"><div style="padding:2px"><span style="font-weight:bold">jnz</span> i32 </div><div class="popup"><b>Opcode:</b> 34<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 JNZ P+4<br><span class="remark">Jump to <tt>i32</tt> if <tt>Z</tt> is not set.</span></div></td>
+<td class="inst inst-j"><div style="padding:2px"><span style="font-weight:bold">jr+</span> i8l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 35<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO YI<br>&nbsp;&nbsp;IOL XI<br>&nbsp;&nbsp;JMP <span class="clobflags">X+Y</span><br><span class="remark">Jump forwards relative to the address of the next instruction. <tt>jr+ 0</tt> is a no-op.</span></div></td>
+<td class="inst inst-j"><div style="padding:2px"><span style="font-weight:bold">jr-</span> i8l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 36<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+1<br>&nbsp;&nbsp;PO YI<br>&nbsp;&nbsp;IOL XI<br>&nbsp;&nbsp;JMP <span class="clobflags">Y-X</span><br><span class="remark">Jump backwards relative to the address of the next instruction. <tt>jr- 0</tt> is a no-op. <tt>jr- 1</tt> is an infinite loop.</span></div></td>
+<td class="inst inst-j"><div style="padding:2px"><span style="font-weight:bold">jz</span> i32 </div><div class="popup"><b>Opcode:</b> 37<br><b>Bytes:</b> 5<br><b>Cycles:</b> 16<br><b>Clobbers:</b> (none)<b><br>Microcode:</b><br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 JZ P+4<br><span class="remark">Jump to <tt>i32</tt> if <tt>Z</tt> is set.</span></div></td>
+<td class="inst inst-out"><div style="padding:2px"><span style="font-weight:bold">out</span> i32, r <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 38<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;<span class="clobflags">YO</span> DI<br><span class="remark">Output <tt>r</tt> to address <tt>i32</tt>.</span></div></td>
+<td class="inst inst-out8"><div style="padding:2px"><span style="font-weight:bold">out8</span> i32, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 39<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO8L YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;<span class="clobflags">YO</span> DI<br><span class="remark">Output the byte value at <tt>(r)</tt> to address <tt>i32</tt>.</span></div></td>
+<td class="inst inst-out16"><div style="padding:2px"><span style="font-weight:bold">out16</span> i32, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3a<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO16L YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;<span class="clobflags">YO</span> DI<br><span class="remark">Output the 16-bit value at <tt>(r)</tt> to address <tt>i32</tt>.</span></div></td>
+<td class="inst inst-out32"><div style="padding:2px"><span style="font-weight:bold">out32</span> i32, (r) <span class="clobflags">+</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3b<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 AI<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 AI P+4<br>&nbsp;&nbsp;<span class="clobflags">YO</span> DI<br><span class="remark">Output the 32-bit value at <tt>(r)</tt> to address <tt>i32</tt>.</span></div></td>
+<td class="inst inst-tbsz"><div style="padding:2px"><span style="font-weight:bold">tbsz</span> r, i32 <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3c<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO32 YI P+4<br>&nbsp;&nbsp;<span class="clobflags">X&amp;Y</span><br>&nbsp;&nbsp;PO JNZ P+2<br>&nbsp;&nbsp;PO JNZ P+1<br><span class="remark">Test bits: if none of the bits set in <tt>i32</tt> are also set in <tt>r</tt>, skip the next <tt>sb</tt>. Use in tandem with <tt>sb</tt> to compute bitwise shift-right of 8 or more bits.</span></div></td>
+<td class="inst inst-tbsz"><div style="padding:2px"><span style="font-weight:bold">sb</span> r, i8l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3d<br><b>Bytes:</b> 3<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;IOH AI P+1<br>&nbsp;&nbsp;MO32 XI<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L YI P+1<br>&nbsp;&nbsp;IOH AI<br>&nbsp;&nbsp;MI32 <span class="clobflags">X|Y</span><br><span class="remark">Set bits in the register at <tt>r</tt> based on <tt>i8l</tt>. i.e. <tt>r |= i8l</tt>.</span></div></td>
+<td class="inst inst-call"><div style="padding:2px"><span style="font-weight:bold">call</span> i32 <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3e<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+4<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;PO MI32<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br>&nbsp;&nbsp;PO YI<br>&nbsp;&nbsp;YI <span class="clobflags">Y-X-1</span><br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO32 JMP<br><span class="remark">Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4. Jump to <tt>i32</tt>.</span></div></td>
+<td class="inst inst-call"><div style="padding:2px"><span style="font-weight:bold">call</span> (i32) <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 3f<br><b>Bytes:</b> 6<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;P+4<br>&nbsp;&nbsp;PO AI<br>&nbsp;&nbsp;MO8L XI P+1<br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;PO MI32<br>&nbsp;&nbsp;<span class="clobflags">Y-X</span> SI<br>&nbsp;&nbsp;PO YI<br>&nbsp;&nbsp;YI <span class="clobflags">Y-X-1</span><br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO32 YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO32 JMP<br><span class="remark">Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4. Jump to the address stored at <tt>(i32)</tt>.</span></div></td>
+</tr>
+<tr><th>4_</th><td class="inst inst-ret"><div style="padding:2px"><span style="font-weight:bold">ret</span>  <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 40<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;<span class="clobflags">Y+X</span> YI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> SI<br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;MO32 JMP<br><span class="remark">Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt> and jump to it.</span></div></td>
+<td class="inst inst-ret"><div style="padding:2px"><span style="font-weight:bold">ret</span> i8l <span class="clobflags">+</span><span class="clobx">!</span><span class="cloby">^</span></div><div class="popup"><b>Opcode:</b> 41<br><b>Bytes:</b> 2<br><b>Cycles:</b> 16<br><b>Clobbers:</b> <span class="clobflags">flags</span>, <span class="clobx">x</span>, <span class="cloby">y</span><b><br>Microcode:</b><br>&nbsp;&nbsp;SO YI<br>&nbsp;&nbsp;IOL XI P+1<br>&nbsp;&nbsp;YI <span class="clobflags">Y+1</span><br>&nbsp;&nbsp;YI <span class="clobflags">Y+1</span><br>&nbsp;&nbsp;YI <span class="clobflags">Y+1</span><br>&nbsp;&nbsp;YI <span class="clobflags">Y+1</span><br>&nbsp;&nbsp;<span class="clobflags">YO</span> AI<br>&nbsp;&nbsp;XI <span class="clobflags">X+Y</span><br>&nbsp;&nbsp;<span class="clobflags">XO</span> SI<br>&nbsp;&nbsp;MO32 JMP<br><span class="remark">Pop the return address off <tt>(sp)</tt> and jump to it, then discard <tt>i8l</tt> further bytes of caller-pushed arguments (i.e. pre-increment <tt>sp</tt> by <tt>4+i8l</tt>).</span></div></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>5_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>6_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>7_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>8_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>9_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>a_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>b_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>c_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>d_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>e_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+<tr><th>f_</th><td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+<td class="inst"></td>
+</tr>
+</table>
+<div class="clobflags"><tt>+</tt> sets <tt>flags</tt></div>
+<div class="clobx"><tt>!</tt> clobbers <tt>x</tt></div>
+<div class="cloby"><tt>^</tt> clobbers <tt>y</tt></div>
+<ul>
+<li>The <tt>x</tt> register functions as an accumulator.</li>
+<li>The <tt>y</tt> register is only exposed for a few instructions (like <tt>xor x, y</tt>)
+where routing the operation through a pseudo-register would cost too many cycles.</li>
+<li><tt>r</tt> parameters are "pseudo-registers": <tt>r0</tt>..<tt>r63</tt>, each 32 bits wide,
+living at the top of memory (<tt>r0</tt> is <tt>0xffffff00</tt>, <tt>r1</tt> is <tt>0xffffff04</tt>,
+and so on, 4 bytes apart), addressed with a single <tt>(i8h)</tt> byte operand.</li>
+<li><tt>sp</tt> is its own physical register (not a pseudo-register), with dedicated
+<tt>SI</tt>/<tt>SO</tt> bus codes.</li>
+<li>No pseudo-register has a fixed architectural role; by convention <tt>r62</tt> is used as
+scratch space where an instruction needs one (e.g. <tt>xor</tt>), documented per-instruction
+with a <tt># implicit: rN</tt>/<tt># clobbers: rN</tt> comment in <tt>ucode.s</tt> rather than
+hardcoded here.</li>
+<li>The flags are set whenever the ALU is used (see the <tt>+</tt> marker). <tt>JZ</tt> jumps if
+the ALU output was 0; <tt>JGT</tt>/<tt>JLT</tt> jump if it was greater/less than 0.</li>
+</ul></body>
+</html>

@@ -40,6 +40,19 @@ BYTE_ORDER_RE = re.compile(r"#\s*byte-order:\s*([\d,\s]+)", re.IGNORECASE)
 # the sp adjustment with a single "Y-X" instead of chaining Y-1/Y+1.
 IMPLICIT_BYTE_RE = re.compile(r"#\s*implicit-byte:\s*(\d+)\b", re.IGNORECASE)
 
+# "# clobbers: r62" (comma-separated for more than one) documents a side
+# effect mk-table-html.py can't work out on its own -- e.g. a register
+# touched only indirectly via a computed memory address, not a literal XI/YI
+# in the microcode. Register clobbers of x/y themselves are instead derived
+# automatically from the microcode (see mk-table-html.py), since every XI/YI
+# in a block is a reliable, exhaustive signal -- this annotation is only for
+# what that scan can't see.
+CLOBBERS_RE = re.compile(r"#\s*clobbers:\s*(.+?)\s*$", re.IGNORECASE)
+
+# A comment on the same line as the instruction's header becomes the remark
+# shown in the cheatsheet's hover box (see mk-table-html.py).
+REMARK_RE = re.compile(r"#\s*(.*)$")
+
 
 def extract_instructions(path):
     instructions = {}
@@ -62,13 +75,22 @@ def extract_instructions(path):
             if m_implicit_byte and current_mnemonic is not None:
                 instructions[current_mnemonic]["implicit_byte"] = int(m_implicit_byte.group(1))
 
+            m_clobbers = CLOBBERS_RE.search(raw_line)
+            if m_clobbers and current_mnemonic is not None:
+                instructions[current_mnemonic]["clobbers"] = [
+                    c.strip() for c in m_clobbers.group(1).split(",") if c.strip() != ""
+                ]
+
             line = normalize_line(raw_line)
             if line == "":
                 continue
 
             m = INSTR_RE.match(line)
             if not m:
-                continue  # a microinstruction line, not a header
+                # a microinstruction line, not a header -- keep it for the cheatsheet
+                if current_mnemonic is not None:
+                    instructions[current_mnemonic]["ucode"].append(line)
+                continue
 
             mnemonic = m.group(1)
             opcode_hex = m.group(2)
@@ -84,7 +106,15 @@ def extract_instructions(path):
             if mnemonic in instructions:
                 raise AsmError(f"line {lineno}: duplicate instruction: {mnemonic}")
 
-            instructions[mnemonic] = {"opcode": opcode, "cycles": T_STATES}
+            m_remark = REMARK_RE.search(raw_line)
+            remark = m_remark.group(1).strip() if m_remark else ""
+
+            instructions[mnemonic] = {
+                "opcode": opcode,
+                "cycles": T_STATES,
+                "remark": remark,
+                "ucode": [],
+            }
             current_mnemonic = mnemonic
 
     if opcode == -1:

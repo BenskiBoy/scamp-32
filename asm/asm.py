@@ -125,11 +125,15 @@ class Assembler:
     # (val) => val
     # 1((65535)) => 1
     # 1(x) => 1
+    # 2(sp) => 2
     def arg2num(self, arg):
         if re.match(r"^(x|y|sp|pc)$", arg):
             self.die(f"can't convert register to number: {arg}")
 
         m = re.search(r"(\d+)\(x\)", arg)
+        if m:
+            return int(m.group(1))
+        m = re.search(r"(\d+)\(sp\)", arg)
         if m:
             return int(m.group(1))
         m = re.search(r"(\d+)\(\(65535\)\)", arg)

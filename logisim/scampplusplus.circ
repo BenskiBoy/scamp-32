@@ -76,7 +76,7 @@
     <a name="appearance" val="logisim_evolution"/>
     <a name="circuit" val="main"/>
     <a name="circuitnamedboxfixedsize" val="true"/>
-    <a name="simulationFrequency" val="32.0"/>
+    <a name="simulationFrequency" val="128.0"/>
     <comp lib="0" loc="(1000,1160)" name="Splitter">
       <a name="fanout" val="9"/>
       <a name="incoming" val="9"/>
@@ -156,6 +156,22 @@
     </comp>
     <comp lib="0" loc="(1250,4640)" name="Tunnel">
       <a name="label" val="RESET_T"/>
+    </comp>
+    <comp lib="0" loc="(1300,2700)" name="Probe">
+      <a name="appearance" val="classic"/>
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(1310,1260)" name="Probe">
+      <a name="appearance" val="classic"/>
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(1320,2000)" name="Probe">
+      <a name="appearance" val="classic"/>
+      <a name="facing" val="west"/>
+    </comp>
+    <comp lib="0" loc="(1320,510)" name="Probe">
+      <a name="appearance" val="classic"/>
+      <a name="facing" val="west"/>
     </comp>
     <comp lib="0" loc="(1380,4300)" name="Pin">
       <a name="appearance" val="classic"/>
@@ -1012,6 +1028,10 @@
       <a name="facing" val="north"/>
       <a name="label" val="B2_3"/>
     </comp>
+    <comp lib="0" loc="(3150,1420)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="CLK"/>
+    </comp>
     <comp lib="0" loc="(3150,3080)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="B2_2W"/>
@@ -1041,9 +1061,6 @@
       <a name="facing" val="north"/>
       <a name="label" val="B3_0"/>
     </comp>
-    <comp lib="0" loc="(3210,1360)" name="Tunnel">
-      <a name="label" val="RAM_CLK"/>
-    </comp>
     <comp lib="0" loc="(3210,3080)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="B2_3W"/>
@@ -1051,6 +1068,9 @@
     <comp lib="0" loc="(3250,2640)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="B3_1"/>
+    </comp>
+    <comp lib="0" loc="(3260,1360)" name="Tunnel">
+      <a name="label" val="RAM_CLK"/>
     </comp>
     <comp lib="0" loc="(3300,2640)" name="Tunnel">
       <a name="facing" val="north"/>
@@ -1364,6 +1384,19 @@
       <a name="facing" val="east"/>
       <a name="label" val="INT_TAKEN"/>
     </comp>
+    <comp lib="0" loc="(470,4520)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="BUSS"/>
+      <a name="width" val="32"/>
+    </comp>
+    <comp lib="0" loc="(470,4550)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="DI"/>
+    </comp>
+    <comp lib="0" loc="(470,4580)" name="Tunnel">
+      <a name="facing" val="east"/>
+      <a name="label" val="CLK"/>
+    </comp>
     <comp lib="0" loc="(530,3970)" name="Probe">
       <a name="appearance" val="classic"/>
       <a name="facing" val="west"/>
@@ -1402,6 +1435,55 @@
       <a name="label" val="BUSS"/>
       <a name="width" val="32"/>
     </comp>
+    <comp lib="0" loc="(580,4460)" name="Splitter">
+      <a name="bit1" val="0"/>
+      <a name="bit10" val="1"/>
+      <a name="bit11" val="1"/>
+      <a name="bit12" val="1"/>
+      <a name="bit13" val="1"/>
+      <a name="bit14" val="1"/>
+      <a name="bit15" val="1"/>
+      <a name="bit16" val="2"/>
+      <a name="bit17" val="2"/>
+      <a name="bit18" val="2"/>
+      <a name="bit19" val="2"/>
+      <a name="bit2" val="0"/>
+      <a name="bit20" val="2"/>
+      <a name="bit21" val="2"/>
+      <a name="bit22" val="2"/>
+      <a name="bit23" val="2"/>
+      <a name="bit24" val="3"/>
+      <a name="bit25" val="3"/>
+      <a name="bit26" val="3"/>
+      <a name="bit27" val="3"/>
+      <a name="bit28" val="3"/>
+      <a name="bit29" val="3"/>
+      <a name="bit3" val="0"/>
+      <a name="bit30" val="3"/>
+      <a name="bit31" val="3"/>
+      <a name="bit4" val="0"/>
+      <a name="bit5" val="0"/>
+      <a name="bit6" val="0"/>
+      <a name="bit7" val="0"/>
+      <a name="bit8" val="1"/>
+      <a name="bit9" val="1"/>
+      <a name="fanout" val="4"/>
+      <a name="incoming" val="32"/>
+    </comp>
+    <comp lib="0" loc="(590,4530)" name="Probe">
+      <a name="appearance" val="classic"/>
+      <a name="facing" val="west"/>
+      <a name="radix" val="10signed"/>
+    </comp>
+    <comp lib="0" loc="(600,4420)" name="Splitter">
+      <a name="fanout" val="8"/>
+      <a name="incoming" val="8"/>
+    </comp>
+    <comp lib="0" loc="(640,4330)" name="Splitter">
+      <a name="facing" val="west"/>
+      <a name="fanout" val="7"/>
+      <a name="incoming" val="7"/>
+    </comp>
     <comp lib="0" loc="(680,3970)" name="Probe">
       <a name="appearance" val="classic"/>
       <a name="labelloc" val="east"/>
@@ -1437,20 +1519,7 @@
     <comp lib="0" loc="(740,3880)" name="Probe">
       <a name="appearance" val="classic"/>
       <a name="facing" val="west"/>
-      <a name="radix" val="16"/>
-    </comp>
-    <comp lib="0" loc="(750,4480)" name="Tunnel">
-      <a name="facing" val="east"/>
-      <a name="label" val="BUSS"/>
-      <a name="width" val="32"/>
-    </comp>
-    <comp lib="0" loc="(750,4510)" name="Tunnel">
-      <a name="facing" val="east"/>
-      <a name="label" val="DI"/>
-    </comp>
-    <comp lib="0" loc="(750,4540)" name="Tunnel">
-      <a name="facing" val="east"/>
-      <a name="label" val="CLK"/>
+      <a name="radix" val="10unsigned"/>
     </comp>
     <comp lib="0" loc="(760,4000)" name="Splitter">
       <a name="appear" val="right"/>
@@ -1475,11 +1544,6 @@
       <a name="label" val="inv_CLK"/>
     </comp>
     <comp lib="0" loc="(860,3930)" name="Constant"/>
-    <comp lib="0" loc="(870,4490)" name="Probe">
-      <a name="appearance" val="classic"/>
-      <a name="facing" val="west"/>
-      <a name="radix" val="10signed"/>
-    </comp>
     <comp lib="0" loc="(890,2810)" name="Tunnel">
       <a name="facing" val="east"/>
       <a name="label" val="LOAD_CLK"/>
@@ -2114,71 +2178,114 @@
     <comp lib="5" loc="(1030,1980)" name="RAM">
       <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
+      <a name="asyncread" val="true"/>
       <a name="databus" val="bidir"/>
     </comp>
     <comp lib="5" loc="(1030,2280)" name="ROM">
       <a name="addrWidth" val="9"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 9 8
-0 17 0 0 fc 1b 0 f8
-0 fc 1b 0 f8 0 fc 1b
-0 f8 0 fc 1b 0 f8 0
-5*3 2 5 3 0 2 8 8
-0 b 1d b 1 0 d 2a
-0 0 c0 3 17 0 18 ca
-1a
+4*b 10 c b 17 8 c 0
+1 e 0 16 b 8 d 1
+1 1 e 0 b 5*0 10 3c
+0 80 40 f8 0 3d 0 0
+3c 0 8 4 f8 0 3d 0
+0 38 0 69 69 0 35 0
+0 0 1 2a 10 0 2a 20
+0 2c ff 3 30 30 34 0
+0 2a 9b 4 0 0 9f 4
+0 16 1 0 0 5 4 0
+be 4 0 4 0 8 4 0
+cf 4 0 0 d 4 0 2
+4 2a fc 80 fc 19 1 0
+2a 8 c 10 c 8 4 2a
+8 ec 4 ff 2f 1 8 0
+0 0 fb 41 6c 20 6c
 </a>
     </comp>
     <comp lib="5" loc="(1030,2760)" name="RAM">
       <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
+      <a name="asyncread" val="true"/>
       <a name="databus" val="bidir"/>
     </comp>
     <comp lib="5" loc="(1030,3060)" name="ROM">
       <a name="addrWidth" val="9"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 9 8
-10 f8 0 80 1c 0 0 40
-20 1c 0 0 10 8 1c 0
-0 4 2 1c 0 0 1 0
-0 1 2 3 1 0 5f 5
-3 0 2 a 3 2 c f8
-0 d d 13 13 3 0 2a
+4*0 3 64 0 b 18 4 c
+b 1b c 0 0 0 1 c
+b b 29 0 0 c 18 0
+0 2b 2a 0 0 3c 0 40
+20 f8 0 3d 0 0 3c 0
+4 2 f8 0 3d f8 0 f
+1e 2a 3 38 0 a 2a c
+0 2a 1c 4 2a 30 ff 30
+30 30 a b 8 0 1 38
+0 0 1 38 0 1 6 22
+0 0 22 0 1 0 4 38
+0 0 22 0 1 38 0 8
+c 3e 0 2f 2a f8 3c 0
+1 f8 0 fc 0 12 12 12
+8 8 2a c 1c 1 0 ff
+c 0 8 39 0 31 1 4
+6c 77 64
 </a>
     </comp>
     <comp lib="5" loc="(1040,1250)" name="RAM">
       <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
+      <a name="asyncread" val="true"/>
       <a name="databus" val="bidir"/>
     </comp>
     <comp lib="5" loc="(1040,1550)" name="ROM">
       <a name="addrWidth" val="9"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 9 8
-5*0 80 40 1c 0 0 20 10
-1c 0 0 8 4 1c 0 0
-2 1 1c f8 5*0 3 64 0
-2 7 4 3 2 9 3 0
-0 0 1 3 2 2 16 0
-0 0 f 19
+0 1 2 3 1 0 5f 5
+c 0 b 1d c b 1f f8
+0 20 c 26 26 c 0 2a
+0 30 65 38 0 0 0 80
+f8 0 3d 0 0 3c 0 10
+8 f8 0 3d 0 0 3c 0
+1 0 52 43 b 12 0 0
+2a 4 2 2a 14 3 2a 24
+1 ff 0 30 30 0 0 5
+0 3e 0 0 2b 3e 0 0
+20 28 b 0 22 0 0 d
+0 3f 0 0 22 0 0 3e
+0 0 5 0 25 1 36 40
+0 2f 0 3d 0 a5 2e 4
+8 8 8 41 2d 2d 0 9
+37 0 ff 4 dd 41 2d 2
+30 34 0 65 2c 72 a
 </a>
     </comp>
     <comp lib="5" loc="(1040,500)" name="RAM">
       <a name="addrWidth" val="19"/>
       <a name="appearance" val="logisim_evolution"/>
+      <a name="asyncread" val="true"/>
       <a name="databus" val="bidir"/>
     </comp>
     <comp lib="5" loc="(1040,800)" name="ROM">
       <a name="addrWidth" val="9"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 9 8
-17 0 0 1b 0 f8 0 fc
-1b 0 f8 0 fc 1b 0 f8
-0 fc 1b 0 f8 0 fc 1a
-0 4*2 4 3 2 6 8 3
-0 1 e 0 16 2 8 c
-1 1 1 e 0 2 0 3
-7
+5*c b 16 c 0 b 1a 8
+0 b 1d 1e 5 0 20 2a
+0 0 5e c 2a f 34 0
+0 0 f8 0 3d 0 0 3c
+0 20 10 f8 0 3d 0 0
+3c 0 2 1 f8 0 d d
+f8 0 2a 0 0 2a 8 5
+2a 18 3 2a 28 4 c 30
+30 19 1 0 0 a 0 0
+0 15 0 0 0 20 2 a
+4 0 8 4 a 5*0 3 4
+4*0 2 f7 4 0 fc 8 0
+0 2f 34 0 40 4*0 8 c
+0 1 c 0 4 2f 34 0
+8 4*0 48 6f 6f 21
 </a>
     </comp>
     <comp lib="5" loc="(1170,3670)" name="ROM">
@@ -2186,31 +2293,66 @@
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 12 8
 1 23 19 35 ac 11*0 1 23
-1 37 12*0 1 23 f9 8a 12*0
-1 23 fc 13*0 1 23 fd ac
-12*0 1 23 fd bc 12*0 1 23
-dc 13*0 1 23 cc 13*0 1 23
-8d ac 12*0 1 23 fd 2c 12*0
-1 23 fd 7c 12*0 1 23 b9
-78 2d 34 2c 9*0 1 23 1
-25 12*0 1 23 3d a1 f8 1
-14 ef 8*0 1 23 1 24 3d
+b9 31 15 ac 10*0 1 23 b9
+31 25 ac 10*0 1 23 b9 31
+35 ac 10*0 1 23 0 1 31
+34 b9 35 a8 7*0 1 23 1
+37 12*0 1 23 3d fc ac 89
+14 9*0 1 23 3d fc ac 89
+24 9*0 1 23 3d fc ac 89
+34 9*0 1 23 b9 34 12*0 1
+23 1 31 88 11*0 1 23 f9
+8a 12*0 1 23 fc 13*0 1 23
+1 24 12*0 1 23 1 34 12*0
+1 23 8d 13*0 1 23 fd ac
+12*0 1 23 0 1 35 b9 34
+a8 8*0 1 23 b9 35 a8 11*0
+1 23 b9 35 1 14 ac 89
+34 7*0 1 23 b9 35 1 14
+ac b9 88 a1 14 5*0 1 23
+ac 13*0 1 23 fd bc 12*0 1
+23 dc 13*0 1 23 cc 13*0 1
+23 b9 35 b0 11*0 1 23 8d
+ac 12*0 1 23 fd 2c 12*0 1
+23 b9 35 2c 11*0 1 23 fd
+7c 12*0 1 23 b9 78 2d 34
+2c 9*0 1 23 1 25 12*0 1
+23 3d a1 f8 1 14 ef 8*0
+1 23 1 24 3d a1 88 1
+14 ef 6*0 1 23 1 34 3d
 a1 88 1 14 ef 6*0 1 23
-1 34 3d a1 88 1 14 ef
-6*0 1 23 3d a1 88 fc ef
-9*0 1 23 3d a1 88 fc ef
-9*0 1 23 3d a1 88 fc ef
-9*0 1 23 3d fc ad a7 a1
-14 8*0 1 23 3d fc ad a7
-a1 24 8*0 1 23 3d fc ad
-a7 a1 34 8*0 1 23 1 30
-12*0 1 23 0 1 35 b9 a0
-9*0 1 23 b9 35 f0 11*0 1
-23 1 30 12*0 1 23 1 19
-35 a1 a2 9*0 1 23 b9 34
-1 35 2c 88 1 19 5 f5
-f5 f5 a0 30 1 23 b9 34
-1 15 b9 78 8*0 1 23 14*0
+3d a1 88 fc ef 9*0 1 23
+3d a1 88 fc ef 9*0 1 23
+3d a1 88 fc ef 9*0 1 23
+3d fc ad a7 a1 14 8*0 1
+23 3d fc ad a7 a1 24 8*0
+1 23 3d fc ad a7 a1 34
+8*0 1 23 1 30 12*0 1 23
+0 1 15 b9 a0 9*0 1 23
+0 1 25 b9 a0 9*0 1 23
+0 1 35 b9 a0 9*0 1 23
+b9 88 12*0 1 23 b9 1 19
+35 b9 a0 8*0 1 23 b9 34
+8d a8 10*0 1 23 b9 35 f0
+11*0 1 23 b9 31 15 a0 10*0
+1 23 b9 31 25 a0 10*0 1
+23 b9 31 35 a0 10*0 1 23
+1 30 12*0 1 23 0 5 fc
+a8 10*0 1 23 0 5 fc e8
+10*0 1 23 1 30 12*0 1 23
+b9 35 1 31 a2 9*0 1 23
+b9 31 15 1 31 a2 8*0 1
+23 b9 31 25 1 31 a2 8*0
+1 23 b9 31 35 1 31 a2
+8*0 1 23 b9 34 1 35 28
+9*0 1 23 b9 34 1 15 b9
+78 8*0 1 23 0 1 14 3d
+a1 0 ef 5 bd a1 30 0
+0 0 1 23 0 1 14 3d
+a1 0 ef 5 bd a1 35 a1
+30 0 1 23 3d fc ad a7
+a1 30 8*0 1 23 3d fc 4*f5
+a1 ac 8f 30 4*0 1 23 14*0
 1 23 14*0 1 23 14*0 1 23
 14*0 1 23 14*0 1 23 14*0 1
 23 14*0 1 23 14*0 1 23 14*0
@@ -2281,55 +2423,74 @@ f5 f5 a0 30 1 23 b9 34
 14*0 1 23 14*0 1 23 14*0 1
 23 14*0 1 23 14*0 1 23 14*0
 1 23 14*0 1 23 14*0 1 23
-14*0 1 23 14*0 1 23 14*0 1
-23 14*0 1 23 14*0 1 23 14*0
-1 23 14*0 1 23 14*0 1 23
-14*0 1 23 14*0 1 23 14*0 1
-23 14*0 1 23 14*0 1 23 14*0
-1 23 14*0 1 23 14*0 1 23
-14*0 1 23 14*0 1 23 14*0 1
-23 14*0 1 23 14*0 1 23 14*0
-1 23 14*0 1 23 14*0 1 23
-14*0 1 23 14*0 1 23 14*0 1
-23 14*0 1 23 14*0 1 23 14*0
-1 23 14*0 1 23 14*0 1 23
-14*0 1 23 14*0 1 23 14*0 1
-23 14*0 1 23 14*0 1 23 14*0
-1 23 14*0 1 23
+14*0 1 23 14*0 1 23
 </a>
     </comp>
     <comp lib="5" loc="(1170,3940)" name="ROM">
       <a name="addrWidth" val="12"/>
       <a name="appearance" val="logisim_evolution"/>
       <a name="contents">addr/data: 12 8
-80 90 80 80 0 11*c0 80 90
-80 b0 12*c0 80 90 91 0 12*c0
-80 90 91 13*c0 80 90 91 0
-12*c0 80 90 91 1 12*c0 80 90
-1 13*c0 80 90 0 13*c0 80 90
-0 0 12*c0 80 90 91 0 12*c0
-80 90 91 1 12*c0 80 90 91
-71 1 80 0 9*c0 80 90 80
-a0 12*c0 80 90 90 0 d1 90
-80 1 8*c0 80 90 80 a0 80
-0 60 80 90 1 6*c0 80 90
-80 b0 80 0 70 80 90 1
-6*c0 80 90 80 0 50 91 1
-9*c0 80 90 80 0 60 91 1
-9*c0 80 90 80 0 70 91 1
-9*c0 80 90 80 91 0 0 0
-80 8*c0 80 90 80 91 0 0
-0 80 8*c0 80 90 80 91 0
-0 0 80 8*c0 80 90 80 8e
-12*c0 80 90 90 80 b0 81 70
-9*c0 80 90 91 80 71 11*c0 80
-90 80 b6 12*c0 80 90 80 90
-b0 0 0 9*c0 80 90 91 80
-80 b0 0 0 80 90 80 1
-1 1 70 88 80 90 91 80
-80 90 81 71 8*c0 80 90 14*c0
-80 90 14*c0 80 90 14*c0 80 90
-14*c0 80 90 14*c0 80 90 14*c0 80
+80 90 90 80 0 11*c0 80 90
+91 80 80 0 10*c0 80 90 91
+80 80 0 10*c0 80 90 91 80
+80 0 10*c0 80 90 90 80 b0
+80 81 80 70 7*c0 80 90 80
+b0 12*c0 80 90 80 91 0 0
+80 9*c0 80 90 80 91 0 0
+80 9*c0 80 90 80 91 0 0
+80 9*c0 80 90 91 80 12*c0 80
+90 80 b0 70 11*c0 80 90 91
+0 12*c0 80 90 91 13*c0 80 90
+80 a0 12*c0 80 90 80 b0 12*c0
+80 90 0 13*c0 80 90 91 0
+12*c0 80 90 90 80 b0 81 80
+70 8*c0 80 90 91 80 70 11*c0
+80 90 91 80 80 90 0 0
+80 7*c0 80 90 91 80 80 90
+0 81 70 0 80 5*c0 80 90
+0 13*c0 80 90 91 1 12*c0 80
+90 1 13*c0 80 90 0 13*c0 80
+90 91 80 70 11*c0 80 90 0
+0 12*c0 80 90 91 0 12*c0 80
+90 91 80 0 11*c0 80 90 91
+1 12*c0 80 90 91 71 1 80
+0 9*c0 80 90 80 a0 12*c0 80
+90 90 0 d1 90 80 1 8*c0
+80 90 80 a0 80 0 60 80
+90 1 6*c0 80 90 80 b0 80
+0 70 80 90 1 6*c0 80 90
+80 0 50 91 1 9*c0 80 90
+80 0 60 91 1 9*c0 80 90
+80 0 70 91 1 9*c0 80 90
+80 91 0 0 0 80 8*c0 80
+90 80 91 0 0 0 80 8*c0
+80 90 80 91 0 0 0 80
+8*c0 80 90 80 8e 12*c0 80 90
+90 80 90 81 70 9*c0 80 90
+90 80 a0 81 70 9*c0 80 90
+90 80 b0 81 70 9*c0 80 90
+91 70 12*c0 80 90 91 80 90
+80 81 70 8*c0 80 90 91 80
+0 70 10*c0 80 90 91 80 71
+11*c0 80 90 91 80 80 0 10*c0
+80 90 91 80 80 0 10*c0 80
+90 91 80 80 0 10*c0 80 90
+80 b6 12*c0 80 90 90 80 81
+e 10*c0 80 90 90 80 81 f
+10*c0 80 90 80 b8 12*c0 80 90
+91 80 80 b0 0 9*c0 80 90
+91 80 80 80 b0 0 8*c0 80
+90 91 80 80 80 b0 0 8*c0
+80 90 91 80 80 80 b0 0
+8*c0 80 90 91 80 80 b0 0
+a6 96 7*c0 80 90 91 80 80
+90 81 71 8*c0 80 90 b0 80
+90 80 0 f0 1 80 0 0
+8e c0 c0 c0 80 90 b0 80
+90 80 0 f0 1 80 0 0
+80 0 8e c0 80 90 80 91
+0 0 0 8e 8*c0 80 90 80
+91 4*1 0 0 0 8e 4*c0 80
 90 14*c0 80 90 14*c0 80 90 14*c0
 80 90 14*c0 80 90 14*c0 80 90
 14*c0 80 90 14*c0 80 90 14*c0 80
@@ -2401,30 +2562,20 @@ b0 0 0 9*c0 80 90 91 80
 14*c0 80 90 14*c0 80 90 14*c0 80
 90 14*c0 80 90 14*c0 80 90 14*c0
 80 90 14*c0 80 90 14*c0 80 90
-14*c0 80 90 14*c0 80 90 14*c0 80
-90 14*c0 80 90 14*c0 80 90 14*c0
-80 90 14*c0 80 90 14*c0 80 90
-14*c0 80 90 14*c0 80 90 14*c0 80
-90 14*c0 80 90 14*c0 80 90 14*c0
-80 90 14*c0 80 90 14*c0 80 90
-14*c0 80 90 14*c0 80 90 14*c0 80
-90 14*c0 80 90 14*c0 80 90 14*c0
-80 90 14*c0 80 90 14*c0 80 90
-14*c0 80 90 14*c0 80 90 14*c0 80
-90 14*c0 80 90 14*c0 80 90 14*c0
-80 90 14*c0 80 90 14*c0
+14*c0
 </a>
     </comp>
     <comp lib="5" loc="(2190,4710)" name="D Flip-Flop">
       <a name="appearance" val="logisim_evolution"/>
     </comp>
-    <comp lib="5" loc="(780,4460)" name="Register">
+    <comp lib="5" loc="(500,4490)" name="Register">
       <a name="appearance" val="logisim_evolution"/>
       <a name="width" val="32"/>
     </comp>
     <comp lib="6" loc="(1570,5110)" name="Button">
       <a name="label" val="IRQ"/>
     </comp>
+    <comp lib="6" loc="(690,4450)" name="TTY"/>
     <comp lib="7" loc="(1960,3480)" name="74138">
       <a name="ShowInternalStructure" val="true"/>
       <a name="facing" val="south"/>
@@ -2555,18 +2706,26 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(1270,2340)" to="(1280,2340)"/>
     <wire from="(1270,3120)" to="(1290,3120)"/>
     <wire from="(1280,1610)" to="(1290,1610)"/>
+    <wire from="(1280,2000)" to="(1280,2050)"/>
+    <wire from="(1280,2000)" to="(1320,2000)"/>
     <wire from="(1280,2050)" to="(1280,2070)"/>
     <wire from="(1280,2050)" to="(1900,2050)"/>
     <wire from="(1280,2070)" to="(1330,2070)"/>
+    <wire from="(1280,2700)" to="(1280,2810)"/>
+    <wire from="(1280,2700)" to="(1300,2700)"/>
     <wire from="(1280,2810)" to="(1280,2850)"/>
     <wire from="(1280,2810)" to="(1910,2810)"/>
     <wire from="(1280,2850)" to="(1330,2850)"/>
     <wire from="(1280,860)" to="(1290,860)"/>
+    <wire from="(1290,1260)" to="(1290,1310)"/>
+    <wire from="(1290,1260)" to="(1310,1260)"/>
     <wire from="(1290,1310)" to="(1290,1340)"/>
     <wire from="(1290,1310)" to="(1900,1310)"/>
     <wire from="(1290,1340)" to="(1330,1340)"/>
     <wire from="(1290,2310)" to="(1290,2330)"/>
     <wire from="(1290,2310)" to="(1350,2310)"/>
+    <wire from="(1290,510)" to="(1290,540)"/>
+    <wire from="(1290,510)" to="(1320,510)"/>
     <wire from="(1290,540)" to="(1290,590)"/>
     <wire from="(1290,540)" to="(1910,540)"/>
     <wire from="(1290,590)" to="(1320,590)"/>
@@ -3420,6 +3579,7 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(3140,4330)" to="(3510,4330)"/>
     <wire from="(3140,4710)" to="(3140,4940)"/>
     <wire from="(3140,4940)" to="(3510,4940)"/>
+    <wire from="(3150,1420)" to="(3190,1420)"/>
     <wire from="(3150,2780)" to="(3150,3080)"/>
     <wire from="(3150,2780)" to="(4290,2780)"/>
     <wire from="(3150,4090)" to="(3150,4320)"/>
@@ -3443,7 +3603,9 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(3180,4230)" to="(3310,4230)"/>
     <wire from="(3180,4670)" to="(3180,4840)"/>
     <wire from="(3180,4840)" to="(3310,4840)"/>
-    <wire from="(3190,1360)" to="(3210,1360)"/>
+    <wire from="(3190,1360)" to="(3260,1360)"/>
+    <wire from="(3190,1400)" to="(3190,1420)"/>
+    <wire from="(3190,1400)" to="(3210,1400)"/>
     <wire from="(3190,1800)" to="(3190,2110)"/>
     <wire from="(3190,1800)" to="(3240,1800)"/>
     <wire from="(3190,2250)" to="(3190,2450)"/>
@@ -4002,7 +4164,18 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(460,3700)" to="(620,3700)"/>
     <wire from="(460,3890)" to="(480,3890)"/>
     <wire from="(470,3950)" to="(490,3950)"/>
+    <wire from="(470,4520)" to="(500,4520)"/>
+    <wire from="(470,4550)" to="(480,4550)"/>
+    <wire from="(470,4580)" to="(500,4580)"/>
+    <wire from="(480,4550)" to="(480,4610)"/>
+    <wire from="(480,4550)" to="(490,4550)"/>
+    <wire from="(480,4610)" to="(700,4610)"/>
     <wire from="(490,3920)" to="(490,3950)"/>
+    <wire from="(490,4540)" to="(490,4550)"/>
+    <wire from="(490,4540)" to="(500,4540)"/>
+    <wire from="(500,4560)" to="(500,4580)"/>
+    <wire from="(500,4580)" to="(500,4600)"/>
+    <wire from="(500,4600)" to="(680,4600)"/>
     <wire from="(500,590)" to="(500,670)"/>
     <wire from="(500,590)" to="(530,590)"/>
     <wire from="(500,700)" to="(530,700)"/>
@@ -4023,11 +4196,16 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(560,2010)" to="(740,2010)"/>
     <wire from="(560,3670)" to="(620,3670)"/>
     <wire from="(560,3830)" to="(560,3870)"/>
+    <wire from="(560,4520)" to="(570,4520)"/>
     <wire from="(560,770)" to="(560,2010)"/>
     <wire from="(560,770)" to="(650,770)"/>
+    <wire from="(570,4520)" to="(570,4530)"/>
+    <wire from="(570,4530)" to="(580,4530)"/>
     <wire from="(580,1300)" to="(580,2050)"/>
     <wire from="(580,1300)" to="(980,1300)"/>
     <wire from="(580,2050)" to="(740,2050)"/>
+    <wire from="(580,4460)" to="(580,4530)"/>
+    <wire from="(580,4530)" to="(590,4530)"/>
     <wire from="(580,780)" to="(580,1300)"/>
     <wire from="(580,780)" to="(630,780)"/>
     <wire from="(590,3800)" to="(590,3870)"/>
@@ -4037,16 +4215,22 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(630,530)" to="(630,780)"/>
     <wire from="(630,530)" to="(700,530)"/>
     <wire from="(630,780)" to="(650,780)"/>
+    <wire from="(640,4330)" to="(660,4330)"/>
     <wire from="(650,3740)" to="(650,3870)"/>
     <wire from="(650,570)" to="(650,770)"/>
     <wire from="(650,570)" to="(700,570)"/>
     <wire from="(650,770)" to="(670,770)"/>
+    <wire from="(660,4330)" to="(660,4440)"/>
+    <wire from="(660,4440)" to="(690,4440)"/>
     <wire from="(680,3900)" to="(700,3900)"/>
     <wire from="(680,3920)" to="(710,3920)"/>
     <wire from="(680,3970)" to="(710,3970)"/>
+    <wire from="(680,4450)" to="(680,4600)"/>
+    <wire from="(680,4450)" to="(690,4450)"/>
     <wire from="(700,3690)" to="(700,3700)"/>
     <wire from="(700,3690)" to="(730,3690)"/>
     <wire from="(700,3700)" to="(700,3900)"/>
+    <wire from="(700,4460)" to="(700,4610)"/>
     <wire from="(710,3880)" to="(710,3910)"/>
     <wire from="(710,3880)" to="(740,3880)"/>
     <wire from="(710,3910)" to="(710,3920)"/>
@@ -4066,14 +4250,9 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(750,2670)" to="(750,3070)"/>
     <wire from="(750,2670)" to="(990,2670)"/>
     <wire from="(750,3070)" to="(1030,3070)"/>
-    <wire from="(750,4480)" to="(780,4480)"/>
-    <wire from="(750,4510)" to="(780,4510)"/>
-    <wire from="(750,4540)" to="(780,4540)"/>
     <wire from="(750,550)" to="(980,550)"/>
     <wire from="(760,4000)" to="(760,4240)"/>
     <wire from="(760,4240)" to="(1090,4240)"/>
-    <wire from="(780,4480)" to="(780,4490)"/>
-    <wire from="(780,4530)" to="(780,4540)"/>
     <wire from="(790,1160)" to="(1000,1160)"/>
     <wire from="(790,1160)" to="(790,1560)"/>
     <wire from="(790,1560)" to="(1040,1560)"/>
@@ -4082,7 +4261,6 @@ b0 0 0 9*c0 80 90 91 80
     <wire from="(790,410)" to="(790,810)"/>
     <wire from="(790,810)" to="(1040,810)"/>
     <wire from="(810,3900)" to="(870,3900)"/>
-    <wire from="(840,4490)" to="(870,4490)"/>
     <wire from="(860,3810)" to="(880,3810)"/>
     <wire from="(860,3840)" to="(870,3840)"/>
     <wire from="(860,3930)" to="(870,3930)"/>
