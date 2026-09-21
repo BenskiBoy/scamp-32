@@ -210,9 +210,10 @@
     "irq": {
         "cycles": 16,
         "opcode": 71,
-        "remark": "Hardware interrupt entry point (never called directly -- see doc/UCODE.md \"Extensibility\"). Disables interrupts (re-enable with <tt>ien</tt> once safe -- otherwise the handler's own first fetch would immediately re-trigger irq). Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4 (width muxed in alongside the forced opcode, read via IOL). Jump to the address in the interrupt vector register.",
+        "remark": "Hardware interrupt entry point (never called directly -- see doc/UCODE.md \"Extensibility\"). Disables interrupts (re-enable with <tt>ien</tt> once safe -- otherwise the handler's own first fetch would immediately re-trigger irq). Switches to the alt <tt>x</tt>'/<tt>y</tt>' bank before touching either register, so neither this prologue nor the handler that runs after it ever clobbers the interrupted code's real <tt>x</tt>/<tt>y</tt> -- see <tt>reti</tt>, which switches back. Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4 (width muxed in alongside the forced opcode, read via IOL). Jump to the address in the interrupt vector register.",
         "ucode": [
             "IDS",
+            "ALTE",
             "SO YI",
             "YO AI",
             "PO MI32",
@@ -729,13 +730,15 @@
         "cycles": 16,
         "implicit_byte": 4,
         "opcode": 69,
-        "remark": "Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt>, re-enable interrupts, and jump to it. Use to return from an interrupt handler entered via <tt>irq</tt>.",
+        "remark": "Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt>, switch back to the main <tt>x</tt>/<tt>y</tt> bank (see <tt>irq</tt>) so the interrupted code sees its own <tt>x</tt>/<tt>y</tt> exactly as it left them, re-enable interrupts, and jump to it. Use to return from an interrupt handler entered via <tt>irq</tt>.",
         "ucode": [
             "SO YI",
             "IOL XI P+1",
             "Y+X YI",
             "YO SI",
             "YO AI",
+            "ALTDS",
+            "IEN",
             "MO32 JMP"
         ]
     },

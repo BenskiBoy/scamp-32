@@ -65,6 +65,8 @@ UCODE = {
     "SO": 0x0038,
     "IEN": 0x0078,
     "IDS": 0x00B8,
+    "ALTDS": 0x00F8,
+    "ALTE": 0x0138,
     "IVO": 0x0178,
     "IOH": 0x01B8,
     "IOL": 0x01F8,

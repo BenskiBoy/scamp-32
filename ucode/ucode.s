@@ -445,13 +445,15 @@ ret: # Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt> 
     YO AI
     MO32 JMP
 
-reti: # Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt>, re-enable interrupts, and jump to it. Use to return from an interrupt handler entered via <tt>irq</tt>.
+reti: # Pre-increment <tt>sp</tt> by 4. Pop the return address off <tt>(sp)</tt>, switch back to the main <tt>x</tt>/<tt>y</tt> bank (see <tt>irq</tt>) so the interrupted code sees its own <tt>x</tt>/<tt>y</tt> exactly as it left them, re-enable interrupts, and jump to it. Use to return from an interrupt handler entered via <tt>irq</tt>.
     # implicit-byte: 4
     SO YI
     IOL XI P+1
     Y+X YI
     YO SI
     YO AI
+    ALTDS
+    IEN
     MO32 JMP
 
 ret i8l: # Pop the return address off <tt>(sp)</tt> and jump to it, then discard <tt>i8l</tt> further bytes of caller-pushed arguments (i.e. pre-increment <tt>sp</tt> by <tt>4+i8l</tt>).
@@ -466,8 +468,9 @@ ret i8l: # Pop the return address off <tt>(sp)</tt> and jump to it, then discard
     XO SI
     MO32 JMP
 
-irq: # Hardware interrupt entry point (never called directly -- see doc/UCODE.md "Extensibility"). Disables interrupts (re-enable with <tt>ien</tt> once safe -- otherwise the handler's own first fetch would immediately re-trigger irq). Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4 (width muxed in alongside the forced opcode, read via IOL). Jump to the address in the interrupt vector register.
+irq: # Hardware interrupt entry point (never called directly -- see doc/UCODE.md "Extensibility"). Disables interrupts (re-enable with <tt>ien</tt> once safe -- otherwise the handler's own first fetch would immediately re-trigger irq). Switches to the alt <tt>x</tt>'/<tt>y</tt>' bank before touching either register, so neither this prologue nor the handler that runs after it ever clobbers the interrupted code's real <tt>x</tt>/<tt>y</tt> -- see <tt>reti</tt>, which switches back. Push the return address onto <tt>(sp)</tt>. Post-decrement <tt>sp</tt> by 4 (width muxed in alongside the forced opcode, read via IOL). Jump to the address in the interrupt vector register.
     IDS
+    ALTE
     SO YI
     YO AI
     PO MI32
