@@ -513,7 +513,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "scamp32-alu.kicad_pro",
+    "filename": "scamp32-memory.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -681,18 +681,38 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "scamp32-alu.kicad_sch",
-        "name": "scamp32-alu",
+        "filename": "scamp32-memory.kicad_sch",
+        "name": "scamp32-memory",
         "uuid": "25c5c16b-993b-4b53-a926-17eead4fb6de"
       }
     ],
-    "used_designators": "U1-2,C1,#PWR1-2",
+    "used_designators": "SW1,J1-3,R1,LED1,JP1-21,#PWR1-2,C1-73,U1-57",
     "variants": []
   },
   "sheets": [
     [
       "25c5c16b-993b-4b53-a926-17eead4fb6de",
-      "scamp32-alu"
+      "scamp32-memory"
+    ],
+    [
+      "6f81499a-1750-4500-a229-3529e9a34dff",
+      "scamp32-memory-address-adder"
+    ],
+    [
+      "6df4a477-db50-4729-beb7-1f4dc2ff7998",
+      "samp32-memory-mux"
+    ],
+    [
+      "3a1b2c1a-93cf-410d-b0ef-c0633b57dd7b",
+      "samp32-memory-mux1"
+    ],
+    [
+      "1fbe7184-9879-4c3a-a070-77d8579322a1",
+      "scamp32-memory-data-bus"
+    ],
+    [
+      "b84ff063-5304-4011-865a-b2342ae9237b",
+      "scamp32-memory-data-bus1"
     ]
   ],
   "text_variables": {},
